@@ -1,0 +1,91 @@
+<!-- Protection par code -->
+<div id="lockScreen" style="position:fixed; inset:0; background:#000; z-index:99999; display:flex; justify-content:center; align-items:center; flex-direction:column; color:white; font-family:sans-serif;">
+    <input id="passwordInput" type="password" placeholder="Code d'accès" style="padding:12px; font-size:18px; text-align:center; border-radius:8px; border:none;">
+    <button onclick="checkPassword()" style="margin-top:15px; padding:10px 25px; border-radius:8px; border:none; cursor:pointer;">
+        Accéder
+    </button>
+    <p id="error" style="color:red;"></p>
+</div>
+
+<!-- Musique -->
+<audio id="bgMusic" loop>
+    <source src="https://drive.google.com/uc?export=download&id=1uSqnzRoFRXHXd797D4a3UDnaKD4suJ3b" type="audio/mp4">
+</audio>
+
+<!-- Bouton secours si autoplay bloqué -->
+<button id="playButton" style="
+position:fixed;
+right:15px;
+bottom:15px;
+z-index:9999;
+background:rgba(0,0,0,0.5);
+color:white;
+border:none;
+padding:8px 14px;
+border-radius:20px;
+font-size:12px;
+display:none;
+cursor:pointer;">
+Play
+</button>
+
+
+<script>
+const music = document.getElementById("bgMusic");
+const playButton = document.getElementById("playButton");
+
+const passwordHash = "4af6ea0776625ccaf1d953afb986e306e66c192bffd566983d53970b6c67c76b";
+
+async function hashText(text){
+    const data = new TextEncoder().encode(text);
+    const hash = await crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(hash))
+    .map(b => b.toString(16).padStart(2,"0"))
+    .join("");
+}
+
+async function checkPassword(){
+    const value = document.getElementById("passwordInput").value;
+    const hash = await hashText(value);
+
+    if(hash === passwordHash){
+        document.getElementById("lockScreen").style.display="none";
+        startMusic();
+    }else{
+        document.getElementById("error").innerHTML="Code incorrect";
+    }
+}
+
+
+function startMusic(){
+    music.play().then(()=>{
+        playButton.style.display="none";
+    }).catch(()=>{
+        playButton.style.display="block";
+    });
+}
+
+
+playButton.onclick=function(){
+    music.play();
+};
+
+
+// Fondu sonore le 28/08/2032 à 13:42:50 UTC
+const fadeDate = new Date("2032-08-28T13:42:50Z").getTime();
+
+setInterval(()=>{
+    const now = Date.now();
+
+    if(now >= fadeDate && now <= fadeDate + 10000){
+
+        const progress = (now - fadeDate) / 10000;
+
+        music.volume = Math.max(0,1-progress);
+
+    }
+
+},100);
+</script>
+</body>
+</html>
