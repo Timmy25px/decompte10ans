@@ -1,74 +1,72 @@
+```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Compteur sécurisé</title>
+<title>Compteur</title>
 
 <style>
 html, body {
     margin: 0;
     padding: 0;
-    overflow: hidden;
     background: black;
 }
 
-/* Écran de code */
+/* Écran de sécurité */
 #accessScreen {
     position: fixed;
     inset: 0;
     background: black;
-    color: white;
-    z-index: 9999;
+    z-index: 99999;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
+    color: white;
     font-family: Arial, sans-serif;
 }
 
-#codeInput {
-    padding: 12px;
-    font-size: 18px;
+#accessBox {
     text-align: center;
-    border-radius: 8px;
-    border: none;
-    margin-top: 15px;
 }
 
-#accessBtn {
-    margin-top: 15px;
-    padding: 10px 25px;
-    border: none;
-    border-radius: 8px;
+#codeInput {
+    padding: 10px;
+    font-size: 18px;
+    text-align: center;
+}
+
+#validateBtn {
+    margin-top: 10px;
+    padding: 10px 20px;
     cursor: pointer;
 }
+
+#error {
+    color: red;
+    margin-top: 10px;
+}
+
+
+/* Bouton Play discret */
+#playButton {
+    position: fixed;
+    right: 15px;
+    bottom: 15px;
+    z-index: 9999;
+    display: none;
+    background: rgba(0,0,0,0.5);
+    color: white;
+    border: 1px solid white;
+    border-radius: 5px;
+    padding: 8px 14px;
+    cursor: pointer;
+}
+
 
 /* Contenu Canva */
 #content {
     display: none;
-    width: 100vw;
-    height: 100vh;
-}
-
-/* Bouton audio */
-#playBtn {
-    display: none;
-    position: fixed;
-    right: 20px;
-    bottom: 20px;
-    z-index: 9998;
-    background: rgba(255,255,255,0.15);
-    color: white;
-    border: 1px solid white;
-    border-radius: 20px;
-    padding: 8px 18px;
-    cursor: pointer;
-}
-
-iframe {
-    width:100%;
-    height:100%;
-    border:none;
 }
 </style>
 
@@ -76,13 +74,33 @@ iframe {
 
 <body>
 
+
+<!-- Demande de code -->
 <div id="accessScreen">
-    <div>Code d'accès</div>
-    <input id="codeInput" type="password">
-    <button id="accessBtn">Valider</button>
+
+    <div id="accessBox">
+
+        <h2>Accès protégé</h2>
+
+        <input id="codeInput"
+               type="password"
+               placeholder="Code d'accès">
+
+        <br>
+
+        <button id="validateBtn">
+            Valider
+        </button>
+
+        <div id="error"></div>
+
+    </div>
+
 </div>
 
 
+
+<!-- Contenu principal -->
 <div id="content">
 
 <div style="position: relative; width: 100%; height: 0; padding-top: 66.6667%;
@@ -90,6 +108,7 @@ iframe {
  border-radius: 8px; will-change: transform;">
 
 <iframe loading="lazy"
+style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
 src="https://www.canva.com/design/DAHQHalUtOM/VW_lvRTYlOogieRFHmu3SA/view?embed"
 allowfullscreen="allowfullscreen"
 allow="fullscreen">
@@ -97,124 +116,217 @@ allow="fullscreen">
 
 </div>
 
+
+<a href="https://www.canva.com/design/DAHQHalUtOM/VW_lvRTYlOogieRFHmu3SA/view?utm_content=DAHQHalUtOM&utm_campaign=designshare&utm_medium=embeds&utm_source=link"
+target="_blank"
+rel="noopener">
+_
+</a>
+par Tim Gaudinaud
+
+
 </div>
 
 
-<button id="playBtn">Play</button>
 
-
-<audio id="music" loop>
-    <source src="https://drive.google.com/uc?export=download&id=1uSqnzRoFRXHXd797D4a3UDnaKD4suJ3b" type="audio/mpeg">
+<!-- Audio fond -->
+<audio id="backgroundMusic" loop>
+    <source src="https://drive.google.com/uc?export=download&id=1uSqnzRoFRXHXd797D4a3UDnaKD4suJ3b"
+    type="audio/mpeg">
 </audio>
 
 
+<!-- Second son -->
 <audio id="zeroSound">
-    <source src="https://res.cloudinary.com/zp5nbve7/video/upload/v1784992368/zero-time_music_gfbxon.m4a" type="audio/mp4">
+    <source src="https://res.cloudinary.com/zp5nbve7/video/upload/v1784992368/zero-time_music_gfbxon.m4a"
+    type="audio/mp4">
 </audio>
+
+
+<button id="playButton">
+Play
+</button>
 
 
 
 <script>
 
-/* Hash SHA-256 du code */
+
+// Hash SHA-256 du code d'accès (le code n'est pas stocké en clair)
 const ACCESS_HASH =
-"c1f8e9f7c8e6e7e7c3c9b8e1b8d3e3d7c7f7e9e5a9f5b5d8e4c2a3b1f9a7c6";
+"4af6ea0776625ccaf1d953afb986e306e66c192bffd566983d53970b6c67c76b";
 
 
 async function sha256(text){
-    const data = new TextEncoder().encode(text);
-    const hash = await crypto.subtle.digest("SHA-256", data);
 
-    return [...new Uint8Array(hash)]
-    .map(b=>b.toString(16).padStart(2,"0"))
+    const data = new TextEncoder().encode(text);
+
+    const hash =
+    await crypto.subtle.digest(
+        "SHA-256",
+        data
+    );
+
+    return Array.from(
+        new Uint8Array(hash)
+    )
+    .map(b => b.toString(16).padStart(2,"0"))
     .join("");
+
 }
 
 
 
-const accessScreen=document.getElementById("accessScreen");
-const content=document.getElementById("content");
-const codeInput=document.getElementById("codeInput");
-const accessBtn=document.getElementById("accessBtn");
+const accessScreen =
+document.getElementById("accessScreen");
 
-const music=document.getElementById("music");
-const zeroSound=document.getElementById("zeroSound");
-const playBtn=document.getElementById("playBtn");
+const content =
+document.getElementById("content");
+
+const input =
+document.getElementById("codeInput");
+
+const button =
+document.getElementById("validateBtn");
+
+const error =
+document.getElementById("error");
+
+const music =
+document.getElementById("backgroundMusic");
+
+const playButton =
+document.getElementById("playButton");
+
+const zeroSound =
+document.getElementById("zeroSound");
 
 
-accessBtn.onclick=async()=>{
 
-    const hash=await sha256(codeInput.value);
+let accessGranted = false;
 
-    if(hash===ACCESS_HASH){
+
+
+button.onclick = async function(){
+
+    const hash =
+    await sha256(input.value);
+
+
+    if(hash === ACCESS_HASH){
+
+        accessGranted = true;
 
         accessScreen.style.display="none";
+
         content.style.display="block";
 
-        music.volume=1;
+        music.volume = 1;
 
-        music.play().catch(()=>{
-            playBtn.style.display="block";
+        music.play()
+        .catch(()=>{
+            playButton.style.display="block";
         });
 
+
     } else {
-        codeInput.value="";
-        alert("Code incorrect");
+
+        error.textContent =
+        "Code incorrect";
+
     }
 
 };
 
 
 
-playBtn.onclick=()=>{
+// Bouton manuel si autoplay bloqué
+playButton.onclick=function(){
+
     music.play();
-    playBtn.style.display="none";
+
+    playButton.style.display="none";
+
 };
 
 
 
-/* Synchronisation UTC */
 
-const fadeStart = Date.UTC(2032,7,28,13,42,50);
-const zeroTime = Date.UTC(2032,7,28,13,44,0);
+// Synchronisation UTC
+function checkTime(){
 
-
-function syncAudio(){
-
-    const now=Date.now();
+    if(!accessGranted)
+        return;
 
 
-    /* Fondu descendant 10 secondes */
+    const now =
+    new Date();
 
-    if(now>=fadeStart && now<fadeStart+10000){
 
-        let remaining = 1-(now-fadeStart)/10000;
+    const targetFade =
+    Date.UTC(
+        2032,
+        7,
+        28,
+        13,
+        42,
+        50
+    );
 
-        music.volume=Math.max(0,remaining);
+
+    const targetZero =
+    Date.UTC(
+        2032,
+        7,
+        28,
+        13,
+        44,
+        0
+    );
+
+
+
+    const current =
+    now.getTime();
+
+
+
+    // Fondu descendant sur 10 secondes
+    if(
+        current >= targetFade &&
+        current <= targetFade + 10000
+    ){
+
+        let progress =
+        (current-targetFade)/10000;
+
+        music.volume =
+        Math.max(
+            0,
+            1-progress
+        );
 
     }
 
 
-    if(now>=fadeStart+10000){
 
-        music.volume=0;
-
-    }
-
-
-
-    /* Second son */
-
-    if(now>=zeroTime && zeroSound.paused){
+    // Lancement du second son exactement à l'heure UTC
+    if(
+        current >= targetZero &&
+        current <= targetZero + 1000 &&
+        zeroSound.paused
+    ){
 
         zeroSound.play();
 
     }
 
+
 }
 
 
-setInterval(syncAudio,50);
+
+setInterval(checkTime,50);
 
 
 </script>
