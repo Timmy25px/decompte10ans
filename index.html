@@ -2,32 +2,39 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Compteur</title>
+<title>Countdown</title>
 
 <style>
 html, body {
     margin: 0;
     padding: 0;
-    background: black;
     overflow: hidden;
+    background: black;
 }
 
-#lockScreen {
+/* Écran de sécurité */
+#accessScreen {
     position: fixed;
     inset: 0;
     background: black;
-    color: white;
+    z-index: 99999;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    flex-direction: column;
-    z-index: 9999;
+    color: white;
     font-family: Arial, sans-serif;
 }
 
+#accessBox {
+    text-align: center;
+}
+
 #codeInput {
-    padding: 10px;
+    padding: 12px;
     font-size: 18px;
+    border-radius: 6px;
+    border: none;
     text-align: center;
 }
 
@@ -35,29 +42,39 @@ html, body {
     margin-top: 15px;
     padding: 10px 25px;
     cursor: pointer;
+    border-radius: 6px;
+    border: none;
 }
 
 #error {
-    color: red;
     margin-top: 10px;
+    color: red;
 }
 
-#content {
-    display: none;
-}
-
-#playBtn {
+/* Bouton Play */
+#playButton {
     position: fixed;
     bottom: 15px;
     right: 15px;
-    z-index: 9998;
+    z-index: 10000;
     display: none;
-    opacity: 0.7;
+    opacity: 0.5;
     background: black;
     color: white;
     border: 1px solid white;
-    padding: 8px 14px;
     border-radius: 5px;
+    padding: 8px 14px;
+    cursor: pointer;
+}
+
+/* Fondu blanc */
+#whiteFade {
+    position: fixed;
+    inset: 0;
+    background: white;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 50000;
 }
 </style>
 
@@ -65,22 +82,33 @@ html, body {
 
 <body>
 
-<div id="lockScreen">
 
-    <h2>Accès sécurisé</h2>
+<!-- Demande de code -->
+<div id="accessScreen">
 
-    <input id="codeInput" type="password" placeholder="Code">
+    <div id="accessBox">
 
-    <button id="validateBtn">
+        <h2>Accès protégé</h2>
+
+        <input id="codeInput"
+        type="password"
+        placeholder="Code d'accès">
+
+        <br>
+
+        <button id="validateBtn">
         Valider
-    </button>
+        </button>
 
-    <div id="error"></div>
+        <div id="error"></div>
+
+    </div>
 
 </div>
 
 
-<div id="content">
+
+<!-- DESIGN CANVA ORIGINAL -->
 
 <div style="position: relative; width: 100%; height: 0; padding-top: 66.6667%;
  padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden;
@@ -95,110 +123,137 @@ allow="fullscreen">
 
 </div>
 
-</div>
 
 
-<button id="playBtn">▶ Play</button>
+<a href="https://www.canva.com/design/DAHQHalUtOM/VW_lvRTYlOogieRFHmu3SA/view?utm_content=DAHQHalUtOM&utm_campaign=designshare&utm_medium=embeds&utm_source=link"
+target="_blank"
+rel="noopener">
+_
+</a>
+par Tim Gaudinaud
 
+
+
+<!-- Audio -->
 
 <audio id="music" loop>
 <source src="https://res.cloudinary.com/zp5nbve7/video/upload/v1784754618/ezyZip_bxpow8.mp4">
 </audio>
 
 
-<audio id="zero">
+<audio id="zeroSound">
 <source src="https://res.cloudinary.com/zp5nbve7/video/upload/v1784992368/zero-time_music_gfbxon.m4a">
 </audio>
 
 
 
+<button id="playButton">
+Play
+</button>
+
+
+<div id="whiteFade"></div>
+
+
+
 <script>
 
-const input = document.getElementById("codeInput");
-const btn = document.getElementById("validateBtn");
 
-const lock = document.getElementById("lockScreen");
-const content = document.getElementById("content");
-
-const music = document.getElementById("music");
-const zero = document.getElementById("zero");
-
-const playBtn = document.getElementById("playBtn");
+/* Empreinte SHA-256 du code */
+const validHash =
+"5e2e3f9d8a7a9a7f0c3c9c6a6e7b1f7f9d8b1e1d3a5b7c9d8e6f7a8b9c0d1e2f";
 
 
-// hash du code (évite le texte visible)
-const accessHash =
-"f7c5fdb9f3c0f4b4bdbfdbd7c8a8e7b2";
+async function sha256(text){
 
+const data =
+new TextEncoder().encode(text);
 
-async function hash(text){
-
-let data = new TextEncoder().encode(text);
-
-let hashBuffer =
-await crypto.subtle.digest("SHA-256", data);
+const hash =
+await crypto.subtle.digest(
+"SHA-256",
+data
+);
 
 return Array.from(
-new Uint8Array(hashBuffer)
+new Uint8Array(hash)
 )
-.map(b=>b.toString(16).padStart(2,"0"))
+.map(x=>x.toString(16).padStart(2,"0"))
 .join("");
 
 }
 
 
 
-btn.onclick = async()=>{
+const accessScreen =
+document.getElementById("accessScreen");
 
-let result = await hash(input.value);
+const input =
+document.getElementById("codeInput");
 
-if(result === accessHash){
+const button =
+document.getElementById("validateBtn");
 
-lock.style.display="none";
-content.style.display="block";
+const error =
+document.getElementById("error");
 
-startMusic();
+const music =
+document.getElementById("music");
 
-}
+const zero =
+document.getElementById("zeroSound");
 
-else{
+const play =
+document.getElementById("playButton");
 
-document.getElementById("error").innerHTML =
-"Code incorrect";
-
-}
-
-};
-
+let unlocked=false;
 
 
-function startMusic(){
 
-music.volume = 1;
+button.onclick = async()=>{
+
+const hash =
+await sha256(input.value);
+
+
+if(hash === validHash){
+
+unlocked=true;
+
+accessScreen.style.display="none";
+
+music.volume=1;
 
 music.play().catch(()=>{
 
-playBtn.style.display="block";
+play.style.display="block";
 
 });
 
+
+}else{
+
+error.textContent="Code incorrect";
+
 }
-
-
-
-playBtn.onclick=()=>{
-
-music.play();
-
-playBtn.style.display="none";
 
 };
 
 
 
-// Heure UTC
+play.onclick=()=>{
 
-function utcNow(){
+music.play();
+
+play.style.display="none";
+
+};
+
+
+
+/* Synchronisation UTC */
+
+function getUTC(){
 
 return new Date();
 
@@ -206,99 +261,110 @@ return new Date();
 
 
 
-let faded=false;
-let white=false;
-let secondStarted=false;
+let fadeDone=false;
+let whiteDone=false;
+let zeroDone=false;
+
 
 
 function checkTime(){
 
 
-let now = utcNow();
+if(!unlocked)
+return;
 
 
-let fadeTime =
-Date.UTC(2032,7,28,13,42,50);
+let now=getUTC();
 
 
-let whiteTime =
-Date.UTC(2032,7,28,13,43,59);
+/* 28/08/2032 13:42:50 UTC */
+
+let fadeDate =
+new Date("2032-08-28T13:42:50Z");
 
 
-let zeroTime =
-Date.UTC(2032,7,28,13,44,0);
+if(now>=fadeDate && !fadeDone){
 
+fadeDone=true;
 
+let start=Date.now();
 
-let current =
-now.getTime();
-
-
-
-/* fondu 10 secondes */
-
-if(current >= fadeTime &&
-current < fadeTime+10000 &&
-!faded){
+let interval=setInterval(()=>{
 
 let elapsed =
-(current-fadeTime)/10000;
+(Date.now()-start)/1000;
 
 music.volume =
-Math.max(0,1-elapsed);
+Math.max(0,1-(elapsed/10));
+
+
+if(elapsed>=10){
+
+clearInterval(interval);
 
 }
 
-
-if(current >= fadeTime+10000 && !faded){
-
-music.volume=0;
-faded=true;
-
-}
-
-
-
-/* écran blanc */
-
-if(current >= whiteTime && !white){
-
-document.body.style.background="white";
-
-content.style.display="none";
-
-white=true;
+},50);
 
 }
 
 
 
-/* second son */
+/* Fondu blanc 13:43:59 */
 
-if(current >= zeroTime &&
-!secondStarted){
+let whiteDate =
+new Date("2032-08-28T13:43:59Z");
 
-secondStarted=true;
+
+if(now>=whiteDate && !whiteDone){
+
+whiteDone=true;
+
+let fade =
+document.getElementById("whiteFade");
+
+fade.style.transition=
+"opacity 1s";
+
+fade.style.opacity=1;
+
+}
+
+
+
+/* Second son 13:44:00 */
+
+let zeroDate =
+new Date("2032-08-28T13:44:00Z");
+
+
+if(now>=zeroDate && !zeroDone){
+
+zeroDone=true;
+
+music.pause();
 
 zero.play();
 
-setTimeout(()=>{
+
+zero.onended=()=>{
 
 music.currentTime=0;
+
 music.volume=1;
+
 music.play();
 
-},10000);
+};
+
+}
 
 
 }
 
 
-}
+setInterval(checkTime,250);
 
-
-
-setInterval(checkTime,50);
 
 
 </script>
