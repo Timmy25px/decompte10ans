@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -10,24 +9,20 @@ html, body {
     margin: 0;
     padding: 0;
     background: black;
+    overflow: hidden;
 }
 
-/* Écran de sécurité */
-#accessScreen {
+#lockScreen {
     position: fixed;
     inset: 0;
     background: black;
-    z-index: 99999;
+    color: white;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    color: white;
+    z-index: 9999;
     font-family: Arial, sans-serif;
-}
-
-#accessBox {
-    text-align: center;
 }
 
 #codeInput {
@@ -37,8 +32,8 @@ html, body {
 }
 
 #validateBtn {
-    margin-top: 10px;
-    padding: 10px 20px;
+    margin-top: 15px;
+    padding: 10px 25px;
     cursor: pointer;
 }
 
@@ -47,26 +42,22 @@ html, body {
     margin-top: 10px;
 }
 
-
-/* Bouton Play discret */
-#playButton {
-    position: fixed;
-    right: 15px;
-    bottom: 15px;
-    z-index: 9999;
-    display: none;
-    background: rgba(0,0,0,0.5);
-    color: white;
-    border: 1px solid white;
-    border-radius: 5px;
-    padding: 8px 14px;
-    cursor: pointer;
-}
-
-
-/* Contenu Canva */
 #content {
     display: none;
+}
+
+#playBtn {
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    z-index: 9998;
+    display: none;
+    opacity: 0.7;
+    background: black;
+    color: white;
+    border: 1px solid white;
+    padding: 8px 14px;
+    border-radius: 5px;
 }
 </style>
 
@@ -74,33 +65,21 @@ html, body {
 
 <body>
 
+<div id="lockScreen">
 
-<!-- Demande de code -->
-<div id="accessScreen">
+    <h2>Accès sécurisé</h2>
 
-    <div id="accessBox">
+    <input id="codeInput" type="password" placeholder="Code">
 
-        <h2>Accès protégé</h2>
+    <button id="validateBtn">
+        Valider
+    </button>
 
-        <input id="codeInput"
-               type="password"
-               placeholder="Code d'accès">
-
-        <br>
-
-        <button id="validateBtn">
-            Valider
-        </button>
-
-        <div id="error"></div>
-
-    </div>
+    <div id="error"></div>
 
 </div>
 
 
-
-<!-- Contenu principal -->
 <div id="content">
 
 <div style="position: relative; width: 100%; height: 0; padding-top: 66.6667%;
@@ -108,7 +87,7 @@ html, body {
  border-radius: 8px; will-change: transform;">
 
 <iframe loading="lazy"
-style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
+style="position:absolute;width:100%;height:100%;top:0;left:0;border:none;padding:0;margin:0;"
 src="https://www.canva.com/design/DAHQHalUtOM/VW_lvRTYlOogieRFHmu3SA/view?embed"
 allowfullscreen="allowfullscreen"
 allow="fullscreen">
@@ -116,210 +95,203 @@ allow="fullscreen">
 
 </div>
 
-
-<a href="https://www.canva.com/design/DAHQHalUtOM/VW_lvRTYlOogieRFHmu3SA/view?utm_content=DAHQHalUtOM&utm_campaign=designshare&utm_medium=embeds&utm_source=link"
-target="_blank"
-rel="noopener">
-_
-</a>
-par Tim Gaudinaud
-
-
 </div>
 
 
+<button id="playBtn">▶ Play</button>
 
-<!-- Audio fond -->
-<audio id="backgroundMusic" loop>
-    <source src="https://drive.google.com/uc?export=download&id=1uSqnzRoFRXHXd797D4a3UDnaKD4suJ3b"
-    type="audio/mpeg">
+
+<audio id="music" loop>
+<source src="https://res.cloudinary.com/zp5nbve7/video/upload/v1784754618/ezyZip_bxpow8.mp4">
 </audio>
 
 
-<!-- Second son -->
-<audio id="zeroSound">
-    <source src="https://res.cloudinary.com/zp5nbve7/video/upload/v1784992368/zero-time_music_gfbxon.m4a"
-    type="audio/mp4">
+<audio id="zero">
+<source src="https://res.cloudinary.com/zp5nbve7/video/upload/v1784992368/zero-time_music_gfbxon.m4a">
 </audio>
-
-
-<button id="playButton">
-Play
-</button>
 
 
 
 <script>
 
+const input = document.getElementById("codeInput");
+const btn = document.getElementById("validateBtn");
 
-// Hash SHA-256 du code d'accès (le code n'est pas stocké en clair)
-const ACCESS_HASH =
-"4af6ea0776625ccaf1d953afb986e306e66c192bffd566983d53970b6c67c76b";
+const lock = document.getElementById("lockScreen");
+const content = document.getElementById("content");
+
+const music = document.getElementById("music");
+const zero = document.getElementById("zero");
+
+const playBtn = document.getElementById("playBtn");
 
 
-async function sha256(text){
+// hash du code (évite le texte visible)
+const accessHash =
+"f7c5fdb9f3c0f4b4bdbfdbd7c8a8e7b2";
 
-    const data = new TextEncoder().encode(text);
 
-    const hash =
-    await crypto.subtle.digest(
-        "SHA-256",
-        data
-    );
+async function hash(text){
 
-    return Array.from(
-        new Uint8Array(hash)
-    )
-    .map(b => b.toString(16).padStart(2,"0"))
-    .join("");
+let data = new TextEncoder().encode(text);
+
+let hashBuffer =
+await crypto.subtle.digest("SHA-256", data);
+
+return Array.from(
+new Uint8Array(hashBuffer)
+)
+.map(b=>b.toString(16).padStart(2,"0"))
+.join("");
 
 }
 
 
 
-const accessScreen =
-document.getElementById("accessScreen");
+btn.onclick = async()=>{
 
-const content =
-document.getElementById("content");
+let result = await hash(input.value);
 
-const input =
-document.getElementById("codeInput");
+if(result === accessHash){
 
-const button =
-document.getElementById("validateBtn");
+lock.style.display="none";
+content.style.display="block";
 
-const error =
-document.getElementById("error");
+startMusic();
 
-const music =
-document.getElementById("backgroundMusic");
+}
 
-const playButton =
-document.getElementById("playButton");
+else{
 
-const zeroSound =
-document.getElementById("zeroSound");
+document.getElementById("error").innerHTML =
+"Code incorrect";
 
-
-
-let accessGranted = false;
-
-
-
-button.onclick = async function(){
-
-    const hash =
-    await sha256(input.value);
-
-
-    if(hash === ACCESS_HASH){
-
-        accessGranted = true;
-
-        accessScreen.style.display="none";
-
-        content.style.display="block";
-
-        music.volume = 1;
-
-        music.play()
-        .catch(()=>{
-            playButton.style.display="block";
-        });
-
-
-    } else {
-
-        error.textContent =
-        "Code incorrect";
-
-    }
+}
 
 };
 
 
 
-// Bouton manuel si autoplay bloqué
-playButton.onclick=function(){
+function startMusic(){
 
-    music.play();
+music.volume = 1;
 
-    playButton.style.display="none";
+music.play().catch(()=>{
+
+playBtn.style.display="block";
+
+});
+
+}
+
+
+
+playBtn.onclick=()=>{
+
+music.play();
+
+playBtn.style.display="none";
 
 };
 
 
 
+// Heure UTC
 
-// Synchronisation UTC
+function utcNow(){
+
+return new Date();
+
+}
+
+
+
+let faded=false;
+let white=false;
+let secondStarted=false;
+
+
 function checkTime(){
 
-    if(!accessGranted)
-        return;
+
+let now = utcNow();
 
 
-    const now =
-    new Date();
+let fadeTime =
+Date.UTC(2032,7,28,13,42,50);
 
 
-    const targetFade =
-    Date.UTC(
-        2032,
-        7,
-        28,
-        13,
-        42,
-        50
-    );
+let whiteTime =
+Date.UTC(2032,7,28,13,43,59);
 
 
-    const targetZero =
-    Date.UTC(
-        2032,
-        7,
-        28,
-        13,
-        44,
-        0
-    );
+let zeroTime =
+Date.UTC(2032,7,28,13,44,0);
 
 
 
-    const current =
-    now.getTime();
+let current =
+now.getTime();
 
 
 
-    // Fondu descendant sur 10 secondes
-    if(
-        current >= targetFade &&
-        current <= targetFade + 10000
-    ){
+/* fondu 10 secondes */
 
-        let progress =
-        (current-targetFade)/10000;
+if(current >= fadeTime &&
+current < fadeTime+10000 &&
+!faded){
 
-        music.volume =
-        Math.max(
-            0,
-            1-progress
-        );
+let elapsed =
+(current-fadeTime)/10000;
 
-    }
+music.volume =
+Math.max(0,1-elapsed);
+
+}
 
 
+if(current >= fadeTime+10000 && !faded){
 
-    // Lancement du second son exactement à l'heure UTC
-    if(
-        current >= targetZero &&
-        current <= targetZero + 1000 &&
-        zeroSound.paused
-    ){
+music.volume=0;
+faded=true;
 
-        zeroSound.play();
+}
 
-    }
+
+
+/* écran blanc */
+
+if(current >= whiteTime && !white){
+
+document.body.style.background="white";
+
+content.style.display="none";
+
+white=true;
+
+}
+
+
+
+/* second son */
+
+if(current >= zeroTime &&
+!secondStarted){
+
+secondStarted=true;
+
+zero.play();
+
+setTimeout(()=>{
+
+music.currentTime=0;
+music.volume=1;
+music.play();
+
+},10000);
+
+
+}
 
 
 }
