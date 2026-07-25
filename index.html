@@ -1,99 +1,35 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<title>Compteur</title>
+<div id="accessScreen" style="
+position:fixed;
+z-index:9999;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:#000;
+display:flex;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+color:white;
+font-family:Arial;
+">
+    <input id="codeInput" type="password" placeholder="Code d'accès"
+    style="padding:10px;font-size:18px;text-align:center;">
 
-<style>
-html, body {
-    margin:0;
-    padding:0;
-    height:100%;
-    overflow:hidden;
-    background:black;
-}
+    <button onclick="validateCode()"
+    style="margin-top:15px;padding:10px 25px;cursor:pointer;">
+        Valider
+    </button>
 
-/* Écran code */
-#lockScreen {
-    position:fixed;
-    inset:0;
-    background:black;
-    color:white;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    flex-direction:column;
-    z-index:9999;
-    font-family:Arial, sans-serif;
-}
-
-#codeInput {
-    padding:12px;
-    font-size:18px;
-    text-align:center;
-    border-radius:8px;
-    border:none;
-}
-
-#unlockBtn {
-    margin-top:15px;
-    padding:10px 20px;
-    border-radius:8px;
-    border:none;
-    cursor:pointer;
-}
-
-#error {
-    margin-top:10px;
-    color:red;
-}
-
-/* Bouton musique */
-#playButton {
-    position:fixed;
-    right:20px;
-    bottom:20px;
-    z-index:9998;
-    display:none;
-    background:rgba(0,0,0,0.5);
-    color:white;
-    border:1px solid white;
-    border-radius:8px;
-    padding:8px 15px;
-    cursor:pointer;
-}
-
-/* Canva */
-#canvaContainer {
-    width:100%;
-    height:100%;
-}
-</style>
-</head>
-
-
-<body>
-
-
-<div id="lockScreen">
-
-    <h2>Accès sécurisé</h2>
-
-    <input id="codeInput" type="password" placeholder="Code d'accès">
-
-    <button id="unlockBtn">Valider</button>
-
-    <div id="error"></div>
-
+    <div id="error"
+    style="color:red;margin-top:10px;"></div>
 </div>
 
 
-
-<div id="canvaContainer">
+<div id="mainContent" style="display:none;">
 
 <div style="position: relative; width: 100%; height: 0; padding-top: 66.6667%;
- padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); 
- margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden;
+ padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden;
  border-radius: 8px; will-change: transform;">
 
 <iframe loading="lazy"
@@ -108,158 +44,175 @@ allow="fullscreen">
 </div>
 
 
-
-<button id="playButton">▶ Play</button>
-
-
-
+<!-- Musique principale -->
 <audio id="backgroundMusic" loop>
-<source src="https://drive.google.com/uc?export=download&id=1uSqnzRoFRXHXd797D4a3UDnaKD4suJ3b" type="audio/mpeg">
+    <source src="https://drive.google.com/uc?export=download&id=1uSqnzRoFRXHXd797D4a3UDnaKD4suJ3b" type="audio/mpeg">
 </audio>
 
 
+<!-- Son déclenché en 2032 -->
 <audio id="zeroSound">
-<source src="https://res.cloudinary.com/zp5nbve7/video/upload/v1784992368/zero-time_music_gfbxon.m4a" type="audio/mp4">
+    <source src="https://res.cloudinary.com/zp5nbve7/video/upload/v1784992368/zero-time_music_gfbxon.m4a"
+    type="audio/mp4">
 </audio>
 
+
+<button id="playButton"
+style="
+display:none;
+position:fixed;
+right:20px;
+bottom:20px;
+z-index:9998;
+background:rgba(0,0,0,0.6);
+color:white;
+border:1px solid white;
+border-radius:8px;
+padding:8px 15px;
+cursor:pointer;
+">
+Play
+</button>
 
 
 <script>
 
-const passwordHash =
+// Hash SHA-256 du code d'accès
+const accessHash =
 "4af6ea0776625ccaf1d953afb986e306e66c192bffd566983d53970b6c67c76b";
-
-const lockScreen=document.getElementById("lockScreen");
-const input=document.getElementById("codeInput");
-const button=document.getElementById("unlockBtn");
-const error=document.getElementById("error");
-
-const music=document.getElementById("backgroundMusic");
-const zero=document.getElementById("zeroSound");
-const playButton=document.getElementById("playButton");
-
-let unlocked=false;
-let fadeDone=false;
-let zeroPlayed=false;
-
 
 
 async function sha256(text){
+    const data = new TextEncoder().encode(text);
+    const hash = await crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(hash))
+    .map(b=>b.toString(16).padStart(2,"0"))
+    .join("");
+}
 
-const data=new TextEncoder().encode(text);
 
-const hash=await crypto.subtle.digest(
-"SHA-256",
-data
-);
+async function validateCode(){
 
-return Array.from(new Uint8Array(hash))
-.map(b=>b.toString(16).padStart(2,"0"))
-.join("");
+    let input =
+    document.getElementById("codeInput").value;
 
+    let hashed =
+    await sha256(input);
+
+    if(hashed === accessHash){
+
+        document.getElementById("accessScreen").style.display="none";
+        document.getElementById("mainContent").style.display="block";
+
+        startMusic();
+
+    }else{
+        document.getElementById("error").innerHTML=
+        "Code incorrect";
+    }
 }
 
 
 
-button.onclick=async()=>{
+const music =
+document.getElementById("backgroundMusic");
 
-const hash=await sha256(input.value);
+const playButton =
+document.getElementById("playButton");
 
-if(hash===passwordHash){
 
-unlocked=true;
+function startMusic(){
 
-lockScreen.style.display="none";
+    music.volume = 1;
 
-playButton.style.display="block";
-
-music.volume=1;
-
-music.play().catch(()=>{});
-
-}
-
-else{
-
-error.textContent="Code incorrect";
+    music.play()
+    .then(()=>{
+        playButton.style.display="none";
+    })
+    .catch(()=>{
+        playButton.style.display="block";
+    });
 
 }
+
+
+playButton.onclick=function(){
+
+    music.play();
+
+    playButton.style.display="none";
 
 };
 
 
 
+// Dates UTC
 
-playButton.onclick=()=>{
+const fadeDate =
+new Date("2032-08-28T13:42:50Z");
 
-music.play();
-
-};
-
+const zeroDate =
+new Date("2032-08-28T13:44:00.000Z");
 
 
+let fadeStarted=false;
+let zeroPlayed=false;
 
 
 function checkTime(){
 
-if(!unlocked)return;
+    const now=new Date();
 
 
-let now=new Date();
+    // Fondu 10 secondes
+    if(now >= fadeDate &&
+       now < new Date(fadeDate.getTime()+10000) &&
+       !fadeStarted){
 
-let targetFade=
-Date.UTC(2032,7,28,13,42,50);
+        fadeStarted=true;
 
-let targetZero=
-Date.UTC(2032,7,28,13,44,0);
+        let startVolume=music.volume;
+        let start=Date.now();
 
+        let fade=setInterval(()=>{
 
-let current=now.getTime();
+            let elapsed=Date.now()-start;
 
+            music.volume =
+            Math.max(0,
+            startVolume*(1-elapsed/10000));
 
+            if(elapsed>=10000){
+                clearInterval(fade);
+                music.volume=0;
+            }
 
-/* Fondu 10 secondes */
+        },50);
 
-if(current>=targetFade && current<targetFade+10000){
-
-let remaining=(targetFade+10000-current)/10000;
-
-music.volume=Math.max(0,remaining);
-
-fadeDone=true;
-
-}
-
-
-if(current>=targetFade+10000 && !fadeDone){
-
-music.volume=0;
-
-}
+    }
 
 
 
-/* Second son */
+    // Son à 13:44:00 UTC
 
-if(current>=targetZero && !zeroPlayed){
+    if(now >= zeroDate && !zeroPlayed){
 
-zero.play().catch(()=>{});
+        zeroPlayed=true;
 
-zeroPlayed=true;
+        document.getElementById("zeroSound").play();
+
+    }
 
 }
-
-
-}
-
 
 
 setInterval(checkTime,100);
 
-
-
 </script>
 
 
-</body>
-</html>
+<a href="https://www.canva.com/design/DAHQHalUtOM/VW_lvRTYlOogieRFHmu3SA/view?utm_content=DAHQHalUtOM&utm_campaign=designshare&utm_medium=embeds&utm_source=link"
+target="_blank" rel="noopener">
+_
+</a>
+par Tim Gaudinaud
