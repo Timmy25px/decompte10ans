@@ -412,44 +412,56 @@ locked ?
 
 };
 
-
-
-
 document.getElementById("formatSelect")
 .onchange=function(){
-
 
 let box=document.getElementById("sourceIframe");
 
 
+let w;
+let h;
+
+
 if(this.value==="16:9"){
 
-box.style.width="1920px";
-box.style.height="1080px";
+w=1920;
+h=1080;
 
 }
 
 
 if(this.value==="4:3"){
 
-box.style.width="1440px";
-box.style.height="1080px";
+w=1440;
+h=1080;
 
 }
 
 
 if(this.value==="Adapter écran"){
 
-box.style.width="100vw";
-box.style.height="100vh";
+w=window.innerWidth;
+h=window.innerHeight;
 
 }
 
 
+
+box.style.width=w+"px";
+box.style.height=h+"px";
+
+
+// centrage automatique
+
+box.style.left=
+(window.innerWidth - w) / 2 + "px";
+
+
+box.style.top=
+(window.innerHeight - h) / 2 + "px";
+
+
 };
-
-
-});
 
 </script>
 </body>
