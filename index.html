@@ -6,43 +6,49 @@
 <title>Compteur</title>
 
 <style>
-html, body {
-    margin: 0 !important;
-    padding: 0 !important;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: black;
-}
+#editorFrame {
 
-/* Cadre adaptable comme une source OBS */
-.canva-frame {
-    position: fixed;
+    position: absolute;
 
-    /* Position */
     left: 0px;
-    top: -50px;
+    top: 0px;
 
-    /* Taille */
     width: 1920px;
     height: 1080px;
 
-    /* Affichage complet */
+    resize: both;
     overflow: hidden;
 
-    z-index: 1;
+    border: 2px dashed white;
+
 }
 
-/* Iframe Canva */
-.canva-frame iframe {
-    width: 100%;
-    height: 100%;
-    border: 0;
-    display: block;
 
-    /* Ajustement comme OBS : zoom / crop */
-    transform: scale(1);
-    transform-origin: top left;
+#editorFrame iframe {
+
+    width:100%;
+    height:100%;
+
+    border:0;
+
+}
+
+
+#lockBtn {
+
+    position: fixed;
+
+    top:20px;
+    right:20px;
+
+    z-index:99999;
+
+    padding:10px 20px;
+
+    font-size:18px;
+
+    cursor:pointer;
+
 }
     
 #lockScreen {
@@ -123,18 +129,41 @@ html, body {
 
 <!-- DESIGN CANVA INCHANGÉ -->
 
-<div class="canva-frame">
+<button id="lockBtn">🔓 Déverrouiller</button>
 
-<iframe 
-loading="lazy"
-src="https://www.canva.com/design/DAHQHalUtOM/VW_lvRTYlOogieRFHmu3SA/view?embed"
-allowfullscreen="allowfullscreen"
-allow="fullscreen">
-</iframe>
-
+<div id="editorFrame">
+    <iframe 
+        src="https://www.canva.com/design/DAHQHalUtOM/VW_lvRTYlOogieRFHmu3SA/view?embed"
+        allowfullscreen>
+    </iframe>
 </div>
-    
-<a href="https://www.canva.com/design/DAHQHalUtOM/VW_lvRTYlOogieRFHmu3SA/view?utm_content=DAHQHalUtOM&utm_campaign=designshare&utm_medium=embeds&utm_source=link" target="_blank" rel="noopener"> _</a> par Tim Gaudinaud
+
+
+<script>
+let locked = false;
+
+const frame = document.getElementById("editorFrame");
+const btn = document.getElementById("lockBtn");
+
+
+btn.onclick = () => {
+
+    locked = !locked;
+
+    if(locked){
+
+        frame.style.pointerEvents = "none";
+        btn.innerHTML = "🔒 Verrouillé";
+
+    } else {
+
+        frame.style.pointerEvents = "auto";
+        btn.innerHTML = "🔓 Déverrouiller";
+
+    }
+
+};
+</script>
 
 <div class="canva-frame">
 
