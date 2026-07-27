@@ -245,70 +245,92 @@ body {
 <script>
 const startDate = new Date(Date.UTC(2032, 7, 28, 13, 44, 0));
 
-function updateCounter() {
+function differenceGreg() {
 
     const now = new Date();
 
-    let years = now.getUTCFullYear() - startDate.getUTCFullYear();
+    let start = startDate;
+    let end = now;
 
-    let anniversary = new Date(Date.UTC(
-        startDate.getUTCFullYear() + years,
-        startDate.getUTCMonth(),
-        startDate.getUTCDate(),
-        startDate.getUTCHours(),
-        startDate.getUTCMinutes(),
-        startDate.getUTCSeconds()
-    ));
+    let negatif = false;
 
-    // Si l'anniversaire n'est pas encore passé cette année
-    if (now < anniversary) {
-        years--;
-        anniversary = new Date(Date.UTC(
-            startDate.getUTCFullYear() + years,
-            startDate.getUTCMonth(),
-            startDate.getUTCDate(),
-            startDate.getUTCHours(),
-            startDate.getUTCMinutes(),
-            startDate.getUTCSeconds()
-        ));
+    if (now < startDate) {
+        negatif = true;
+        start = now;
+        end = startDate;
     }
 
 
-    let diff = Math.floor((now - anniversary) / 1000);
+    let years = end.getUTCFullYear() - start.getUTCFullYear();
+    let months = end.getUTCMonth() - start.getUTCMonth();
+    let days = end.getUTCDate() - start.getUTCDate();
+    let hours = end.getUTCHours() - start.getUTCHours();
+    let minutes = end.getUTCMinutes() - start.getUTCMinutes();
+    let seconds = end.getUTCSeconds() - start.getUTCSeconds();
+    let tenths = Math.floor(end.getUTCMilliseconds() / 100);
 
 
-    const months = Math.floor(diff / (30 * 24 * 3600));
-    diff -= months * 30 * 24 * 3600;
+    if (tenths < 0) {
+        tenths += 10;
+        seconds--;
+    }
+
+    if (seconds < 0) {
+        seconds += 60;
+        minutes--;
+    }
+
+    if (minutes < 0) {
+        minutes += 60;
+        hours--;
+    }
+
+    if (hours < 0) {
+        hours += 24;
+        days--;
+    }
 
 
-    const weeks = Math.floor(diff / (7 * 24 * 3600));
-    diff -= weeks * 7 * 24 * 3600;
+    if (days < 0) {
+
+        const previousMonth = new Date(
+            Date.UTC(
+                end.getUTCFullYear(),
+                end.getUTCMonth(),
+                0
+            )
+        );
+
+        days += previousMonth.getUTCDate();
+        months--;
+    }
 
 
-    const days = Math.floor(diff / (24 * 3600));
-    diff -= days * 24 * 3600;
+    if (months < 0) {
+        months += 12;
+        years--;
+    }
 
 
-    const hours = Math.floor(diff / 3600);
-    diff -= hours * 3600;
+    if (negatif) {
+        years = -years;
+    }
 
 
-    const minutes = Math.floor(diff / 60);
-    const seconds = diff - minutes * 60;
-
-
-    document.getElementById("years").textContent = years;
+    document.getElementById("years").textContent = Math.abs(years);
     document.getElementById("months").textContent = months;
-    document.getElementById("weeks").textContent = weeks;
-    document.getElementById("days").textContent = days;
+    document.getElementById("weeks").textContent = Math.floor(days / 7);
+    document.getElementById("days").textContent = days % 7;
     document.getElementById("hours").textContent = hours;
     document.getElementById("minutes").textContent = minutes;
-    document.getElementById("seconds").textContent = seconds;
+    document.getElementById("seconds").textContent = seconds + "." + tenths;
 
 }
 
-updateCounter();
-setInterval(updateCounter,1000);
+
+differenceGreg();
+
+setInterval(differenceGreg,100);
 </script>
 </div>
 
