@@ -6,72 +6,29 @@
 <title>Compteur</title>
 
 <style>
-#obsToolbar {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    z-index: 999999;
-
-    display: flex;
-    gap: 10px;
-
-    padding: 12px;
-
-    background: rgba(20,20,20,0.85);
-    backdrop-filter: blur(10px);
-
-    border-radius: 18px;
+html, body {
+    margin:0;
+    padding:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#000;
 }
-
-
-/* boutons style moderne */
-
-.obsButton,
-#formatSelect {
-
-    height: 45px;
-
-    padding: 0 18px;
-
-    border-radius: 12px;
-
-    border: 9px solid transparent;
-
-    border-image: linear-gradient(
-        90deg,
-        #8C52FF,
-        #FF914D
-    ) 1;
-
-    background: linear-gradient(
-        90deg,
-        #FF66C4,
-        #FFDE59
-    );
-
-    color: white;
-
-    font-weight: bold;
-
-    cursor: pointer;
-
-    font-size: 15px;
-
-}
-
 
 
 #sourceIframe {
 
-    position: absolute;
+    position:absolute;
 
-    left:100px;
-    top:100px;
+    left:0;
+    top:0;
 
-    width:1920px;
-    height:1080px;
+    width:100vw;
+    height:100vh;
 
     overflow:hidden;
+
+    z-index:1;
 
 }
 
@@ -88,309 +45,48 @@
 }
 
 
+#obsToolbar {
 
-.handle {
+    position:fixed;
 
-    position:absolute;
+    top:20px;
+    left:20px;
 
-    width:14px;
-    height:14px;
-
-    background:white;
-
-    border:2px solid black;
-
-    display:none;
+    z-index:999999;
 
 }
 
 
+.obsButton,
+#formatSelect {
 
-.edit .handle {
+    padding:12px 18px;
 
-    display:block;
+    border-radius:14px;
 
-}
+    border:9px solid transparent;
 
-
-.tl {
-top:-7px;
-left:-7px;
-}
-
-.tr {
-top:-7px;
-right:-7px;
-}
-
-.bl {
-bottom:-7px;
-left:-7px;
-}
-
-.br {
-bottom:-7px;
-right:-7px;
-}
+    border-image:linear-gradient(
+        90deg,
+        #8C52FF,
+        #FF914D
+    ) 1;
 
 
-</style>
+    background:linear-gradient(
+        90deg,
+        #FF66C4,
+        #FFDE59
+    );
 
 
-<script>
+    color:white;
 
-window.addEventListener("load",()=>{
+    font-weight:bold;
 
-
-const box=document.querySelector("#sourceIframe");
-
-
-/* sécurité si iframe absente */
-
-if(!box){
-    console.log("sourceIframe introuvable");
-    return;
-}
-
-
-
-/* création menu */
-
-let menu=document.createElement("div");
-
-menu.id="obsToolbar";
-
-
-menu.innerHTML=`
-
-<button class="obsButton" id="lockBtn">
-🔓 Déverrouiller
-</button>
-
-
-<select id="formatSelect">
-
-<option>Adapter écran</option>
-<option>16:9</option>
-<option>4:3</option>
-<option>16:10</option>
-<option>21:9</option>
-
-</select>
-
-
-<button class="obsButton" id="cropBtn">
-✂️ Crop
-</button>
-
-`;
-
-
-document.body.appendChild(menu);
-
-
-
-
-/* poignées */
-
-["tl","tr","bl","br"].forEach(pos=>{
-
-let h=document.createElement("div");
-
-h.className="handle "+pos;
-
-box.appendChild(h);
-
-});
-
-
-
-
-let unlocked=true;
-
-
-document.querySelector("#lockBtn").onclick=()=>{
-
-
-unlocked=!unlocked;
-
-
-if(unlocked){
-
-box.classList.add("edit");
-
-document.querySelector("#lockBtn").textContent=
-"🔓 Déverrouiller";
+    cursor:pointer;
 
 }
-
-else{
-
-box.classList.remove("edit");
-
-document.querySelector("#lockBtn").textContent=
-"🔒 Verrouillé";
-
-}
-
-
-};
-
-
-
-
-
-/* déplacement */
-
-let moving=false;
-
-let startX=0;
-let startY=0;
-
-
-box.addEventListener("mousedown",e=>{
-
-
-if(!unlocked)return;
-
-
-if(e.target.classList.contains("handle"))
-return;
-
-
-moving=true;
-
-
-startX=e.clientX-box.offsetLeft;
-startY=e.clientY-box.offsetTop;
-
-
-});
-
-
-
-document.addEventListener("mousemove",e=>{
-
-
-if(!moving)return;
-
-
-box.style.left=(e.clientX-startX)+"px";
-
-box.style.top=(e.clientY-startY)+"px";
-
-
-});
-
-
-
-document.addEventListener("mouseup",()=>{
-
-moving=false;
-
-});
-
-
-
-
-
-
-/* formats */
-
-document.querySelector("#formatSelect")
-.addEventListener("change",e=>{
-
-
-switch(e.target.value){
-
-
-case"Adapter écran":
-
-box.style.width="100vw";
-box.style.height="100vh";
-
-break;
-
-
-
-case"16:9":
-
-box.style.width="1920px";
-box.style.height="1080px";
-
-break;
-
-
-
-case"4:3":
-
-box.style.width="1440px";
-box.style.height="1080px";
-
-break;
-
-
-
-case"16:10":
-
-box.style.width="1920px";
-box.style.height="1200px";
-
-break;
-
-
-
-case"21:9":
-
-box.style.width="2560px";
-box.style.height="1080px";
-
-break;
-
-
-}
-
-
-
-});
-
-
-
-
-
-/* crop */
-
-let cropped=false;
-
-
-document.querySelector("#cropBtn").onclick=e=>{
-
-
-cropped=!cropped;
-
-
-box.style.clipPath =
-cropped ?
-"inset(50px 50px 50px 50px)"
-:
-"none";
-
-
-e.target.textContent =
-cropped ?
-"✂️ Crop ON"
-:
-"✂️ Crop";
-
-
-};
-
-
-
-box.classList.add("edit");
-
-
-});
 
 #lockScreen input {
     padding: 10px;
@@ -458,11 +154,11 @@ box.classList.add("edit");
 <!-- DESIGN CANVA INCHANGÉ -->
 <div id="sourceIframe">
 
-<div id="sourceIframe">
-    <iframe 
-        src="https://timmy25px.github.io/iframe-canva-2/"
-        allowfullscreen>
-    </iframe>
+<iframe
+src="https://timmy25px.github.io/iframe-canva-2/"
+allowfullscreen>
+</iframe>
+
 </div>
 
 <audio id="mainMusic" loop>
@@ -651,6 +347,109 @@ function timer(){
 
 
 timer();
+
+</script>
+<script>
+
+window.addEventListener("load",()=>{
+
+
+let iframe = document.querySelector("#sourceIframe iframe");
+
+
+if(!iframe){
+
+console.log("iframe introuvable");
+
+return;
+
+}
+
+
+
+let toolbar=document.createElement("div");
+
+toolbar.id="obsToolbar";
+
+
+toolbar.innerHTML=`
+
+<button class="obsButton" id="lock">
+🔓 Déverrouiller
+</button>
+
+
+<select id="formatSelect">
+
+<option>Adapter écran</option>
+<option>16:9</option>
+<option>4:3</option>
+
+</select>
+
+`;
+
+document.body.appendChild(toolbar);
+
+
+
+let locked=false;
+
+
+
+document.getElementById("lock").onclick=function(){
+
+
+locked=!locked;
+
+
+this.textContent =
+locked ?
+"🔒 Verrouillé"
+:
+"🔓 Déverrouiller";
+
+
+};
+
+
+
+
+document.getElementById("formatSelect")
+.onchange=function(){
+
+
+let box=document.getElementById("sourceIframe");
+
+
+if(this.value==="16:9"){
+
+box.style.width="1920px";
+box.style.height="1080px";
+
+}
+
+
+if(this.value==="4:3"){
+
+box.style.width="1440px";
+box.style.height="1080px";
+
+}
+
+
+if(this.value==="Adapter écran"){
+
+box.style.width="100vw";
+box.style.height="100vh";
+
+}
+
+
+};
+
+
+});
 
 </script>
 </body>
