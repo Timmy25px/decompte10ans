@@ -550,42 +550,12 @@ let resize=false;
 
 
 <!-- DESIGN CANVA INCHANGÉ -->
-<button id="lockBtn">🔓 Déverrouiller</button>
-
-<div id="editorFrame">
+<div id="sourceIframe">
     <iframe 
         src="https://timmy25px.github.io/iframe-canva-2/"
         allowfullscreen>
     </iframe>
 </div>
-
-
-<script>
-let locked = false;
-
-const frame = document.getElementById("editorFrame");
-const btn = document.getElementById("lockBtn");
-
-
-btn.onclick = () => {
-
-    locked = !locked;
-
-    if(locked){
-
-        frame.style.pointerEvents = "none";
-        btn.innerHTML = "🔒 Verrouillé";
-
-    } else {
-
-        frame.style.pointerEvents = "auto";
-        btn.innerHTML = "🔓 Déverrouiller";
-
-    }
-
-};
-</script>
-    
 </script>
 
 <audio id="mainMusic" loop>
