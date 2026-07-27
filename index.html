@@ -6,33 +6,32 @@
 <title>Compteur</title>
 
 <style>
-<style>
-
 #toolbar {
 
 position:fixed;
 top:10px;
 right:10px;
-z-index:99999;
 
 background:#111;
 color:white;
 
 padding:10px;
-border-radius:10px;
+
+border-radius:8px;
+
+z-index:99999;
 
 font-family:Arial;
 
 }
 
 
+
 #toolbar button,
 #toolbar select {
 
-padding:7px;
+padding:6px;
 margin:3px;
-
-cursor:pointer;
 
 }
 
@@ -48,15 +47,14 @@ top:100px;
 width:1920px;
 height:1080px;
 
-overflow:hidden;
 
-background:black;
+overflow:hidden;
 
 border:2px dashed transparent;
 
-box-sizing:border-box;
 
 }
+
 
 
 #sourceIframe.edit {
@@ -68,6 +66,7 @@ border-color:white;
 
 
 #sourceIframe iframe {
+
 
 width:100%;
 height:100%;
@@ -86,16 +85,16 @@ pointer-events:none;
 
 position:absolute;
 
-width:14px;
-height:14px;
+width:12px;
+height:12px;
 
 background:white;
 
-border:2px solid black;
+border:1px solid black;
 
 display:none;
 
-z-index:999;
+z-index:10;
 
 }
 
@@ -109,16 +108,10 @@ display:block;
 
 
 
-.tl {left:-8px;top:-8px;cursor:nwse-resize;}
-.tr {right:-8px;top:-8px;cursor:nesw-resize;}
-.bl {left:-8px;bottom:-8px;cursor:nesw-resize;}
-.br {right:-8px;bottom:-8px;cursor:nwse-resize;}
-
-.ml {left:-8px;top:50%;cursor:ew-resize;}
-.mr {right:-8px;top:50%;cursor:ew-resize;}
-
-.mt {top:-8px;left:50%;cursor:ns-resize;}
-.mb {bottom:-8px;left:50%;cursor:ns-resize;}
+.tl {left:-6px;top:-6px;cursor:nwse-resize;}
+.tr {right:-6px;top:-6px;cursor:nesw-resize;}
+.bl {left:-6px;bottom:-6px;cursor:nesw-resize;}
+.br {right:-6px;bottom:-6px;cursor:nwse-resize;}
 
 
 
@@ -126,11 +119,9 @@ display:block;
 
 
 
-
-
 <div id="toolbar">
 
-<button id="lock">
+<button id="lockBtn">
 🔓 Déverrouiller
 </button>
 
@@ -141,31 +132,31 @@ display:block;
 Adapter écran
 </option>
 
-<option value="16:9">
+<option value="16/9">
 16:9
 </option>
 
-<option value="4:3">
+<option value="4/3">
 4:3
 </option>
 
-<option value="16:10">
+<option value="16/10">
 16:10
 </option>
 
-<option value="21:9">
+<option value="21/9">
 21:9
 </option>
 
-<option value="1:1">
+<option value="1/1">
 1:1
 </option>
 
 </select>
 
 
-<button id="reset">
-↩ Reset
+<button id="cropBtn">
+✂️ Crop
 </button>
 
 
@@ -180,25 +171,22 @@ Adapter écran
 
 const box=document.getElementById("sourceIframe");
 
-const lock=document.getElementById("lock");
+const lockBtn=document.getElementById("lockBtn");
 
 const ratio=document.getElementById("ratio");
 
-const reset=document.getElementById("reset");
-
+const cropBtn=document.getElementById("cropBtn");
 
 
 let unlocked=true;
 
+let crop=false;
 
 
-// ajout poignées
 
-[
-"tl","tr","bl","br",
-"ml","mr","mt","mb"
+// poignées
 
-].forEach(c=>{
+["tl","tr","bl","br"].forEach(c=>{
 
 let h=document.createElement("div");
 
@@ -207,156 +195,22 @@ h.className="handle "+c;
 box.appendChild(h);
 
 
-});
-
-
-
-box.classList.add("edit");
-
-
-
-
-
-// verrouillage
-
-
-lock.onclick=()=>{
-
-
-unlocked=!unlocked;
-
-
-if(unlocked){
-
-box.classList.add("edit");
-
-lock.textContent="🔓 Déverrouiller";
-
-}
-
-else{
-
-box.classList.remove("edit");
-
-lock.textContent="🔒 Verrouillé";
-
-}
-
-
-};
-
-
-
-
-
-
-
-// déplacement
-
-
-let moving=false;
-
-let startX,startY,startL,startT;
-
-
-
-box.onmousedown=e=>{
-
-
-if(!unlocked)return;
-
-if(e.target.classList.contains("handle"))return;
-
-
-
-moving=true;
-
-
-startX=e.clientX;
-startY=e.clientY;
-
-startL=box.offsetLeft;
-startT=box.offsetTop;
-
-
-};
-
-
-
-document.onmousemove=e=>{
-
-
-if(moving){
-
-
-box.style.left=
-startL+(e.clientX-startX)+"px";
-
-
-box.style.top=
-startT+(e.clientY-startY)+"px";
-
-
-}
-
-
-};
-
-
-
-document.onmouseup=()=>{
-
-moving=false;
-
-};
-
-
-
-
-
-
-
-
-// resize + crop
-
-
-let resizing=false;
-
-let handle="";
-
-let sx,sy;
-
-let sw,sh;
-
-let sl,st;
-
-
-
-document.querySelectorAll(".handle")
-.forEach(h=>{
-
-
 h.onmousedown=e=>{
 
-
 if(!unlocked)return;
 
 
-resizing=true;
+resize=true;
 
-handle=h.classList[1];
+corner=c;
 
+startX=e.clientX;
 
-sx=e.clientX;
-sy=e.clientY;
+startY=e.clientY;
 
+startW=box.offsetWidth;
 
-sw=box.offsetWidth;
-sh=box.offsetHeight;
-
-
-sl=box.offsetLeft;
-st=box.offsetTop;
+startH=box.offsetHeight;
 
 
 e.stopPropagation();
@@ -370,43 +224,113 @@ e.stopPropagation();
 
 
 
+// verrouillage
+
+
+lockBtn.onclick=()=>{
+
+
+unlocked=!unlocked;
+
+
+if(unlocked){
+
+box.classList.add("edit");
+
+lockBtn.innerHTML="🔓 Déverrouiller";
+
+}
+
+else{
+
+box.classList.remove("edit");
+
+lockBtn.innerHTML="🔒 Verrouillé";
+
+}
+
+
+save();
+
+
+};
+
+
+
+
+
+// déplacement
+
+
+let drag=false;
+
+
+box.onmousedown=e=>{
+
+
+if(!unlocked)return;
+
+if(e.target.className.includes("handle"))return;
+
+
+drag=true;
+
+
+dx=e.clientX-box.offsetLeft;
+dy=e.clientY-box.offsetTop;
+
+
+};
+
+
+
 document.onmousemove=e=>{
 
 
-if(!resizing)return;
+if(drag){
 
 
-let dx=e.clientX-sx;
+box.style.left=e.clientX-dx+"px";
+box.style.top=e.clientY-dy+"px";
 
-let dy=e.clientY-sy;
-
-
-
-if(handle.includes("r"))
-box.style.width=sw+dx+"px";
-
-
-if(handle.includes("b"))
-box.style.height=sh+dy+"px";
-
-
-
-if(handle.includes("l")){
-
-box.style.width=sw-dx+"px";
-box.style.left=sl+dx+"px";
 
 }
 
 
 
-if(handle.includes("t")){
+if(resize){
 
-box.style.height=sh-dy+"px";
-box.style.top=st+dy+"px";
+
+let dw=e.clientX-startX;
+let dh=e.clientY-startY;
+
+
+if(corner.includes("r"))
+box.style.width=startW+dw+"px";
+
+
+if(corner.includes("b"))
+box.style.height=startH+dh+"px";
+
+
+
+if(corner.includes("l")){
+
+box.style.width=startW-dw+"px";
+box.style.left=box.offsetLeft+dw+"px";
 
 }
 
+
+if(corner.includes("t")){
+
+box.style.height=startH-dh+"px";
+box.style.top=box.offsetTop+dh+"px";
+
+}
+
+
+}
 
 
 };
@@ -415,12 +339,43 @@ box.style.top=st+dy+"px";
 
 document.onmouseup=()=>{
 
-resizing=false;
+drag=false;
+resize=false;
+
+save();
 
 };
 
 
 
+
+
+// crop OBS-like
+
+
+cropBtn.onclick=()=>{
+
+crop=!crop;
+
+
+if(crop){
+
+box.style.clipPath="inset(10px 10px 10px 10px)";
+
+cropBtn.innerHTML="✂️ Crop ON";
+
+}
+
+else{
+
+box.style.clipPath="none";
+
+cropBtn.innerHTML="✂️ Crop OFF";
+
+}
+
+
+};
 
 
 
@@ -435,19 +390,15 @@ ratio.onchange=()=>{
 switch(ratio.value){
 
 
-case "screen":
+case"screen":
 
-box.style.left="0px";
-box.style.top="0px";
-
-box.style.width="100vw";
-box.style.height="100vh";
+box.style.width=innerWidth+"px";
+box.style.height=innerHeight+"px";
 
 break;
 
 
-
-case "16:9":
+case"16/9":
 
 box.style.width="1920px";
 box.style.height="1080px";
@@ -455,8 +406,7 @@ box.style.height="1080px";
 break;
 
 
-
-case "4:3":
+case"4/3":
 
 box.style.width="1440px";
 box.style.height="1080px";
@@ -464,8 +414,7 @@ box.style.height="1080px";
 break;
 
 
-
-case "16:10":
+case"16/10":
 
 box.style.width="1920px";
 box.style.height="1200px";
@@ -473,8 +422,7 @@ box.style.height="1200px";
 break;
 
 
-
-case "21:9":
+case"21/9":
 
 box.style.width="2560px";
 box.style.height="1080px";
@@ -482,8 +430,7 @@ box.style.height="1080px";
 break;
 
 
-
-case "1:1":
+case"1/1":
 
 box.style.width="1080px";
 box.style.height="1080px";
@@ -494,25 +441,50 @@ break;
 }
 
 
-};
-
-
-
-
-
-
-
-reset.onclick=()=>{
-
-
-box.style.left="100px";
-box.style.top="100px";
-
-box.style.width="1920px";
-box.style.height="1080px";
-
+save();
 
 };
+
+
+
+
+
+// sauvegarde
+
+
+function save(){
+
+localStorage.setItem("iframeTransform",
+JSON.stringify({
+
+left:box.style.left,
+top:box.style.top,
+width:box.style.width,
+height:box.style.height
+
+}));
+
+}
+
+
+
+let saved=JSON.parse(localStorage.getItem("iframeTransform"));
+
+
+if(saved){
+
+box.style.left=saved.left;
+box.style.top=saved.top;
+box.style.width=saved.width;
+box.style.height=saved.height;
+
+}
+
+
+
+box.classList.add("edit");
+
+let resize=false;
 
 #lockScreen input {
     padding: 10px;
