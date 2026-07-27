@@ -6,45 +6,63 @@
 <title>Compteur</title>
 
 <style>
-#tools {
+<style>
+
+#controleIframe {
     position: fixed;
     top: 10px;
-    left: 10px;
+    right: 10px;
     z-index: 99999;
-    background: rgba(0,0,0,.7);
+    background: #111;
     padding: 10px;
     border-radius: 10px;
-    font-family: Arial;
     color:white;
+    font-family:Arial;
 }
 
 
-#tools button,
-#tools select {
+#controleIframe button,
+#controleIframe select {
 
     margin:3px;
-    padding:8px;
-
+    padding:6px 10px;
     cursor:pointer;
 
 }
 
-<div id="iframe-container">
 
-    <iframe 
-        src="https://timmy25px.github.io/iframe-canva-2/"
-        allowfullscreen="allowfullscreen"
-        allow="fullscreen">
-    </iframe>
 
-    <div id="top-left" class="handle"></div>
-    <div id="top-right" class="handle"></div>
-    <div id="bottom-left" class="handle"></div>
-    <div id="bottom-right" class="handle"></div>
+#iframeSource {
 
-</div>
+    position:absolute;
 
-#iframe-container iframe {
+    left:100px;
+    top:100px;
+
+    width:1920px;
+    height:1080px;
+
+    overflow:hidden;
+
+    resize:both;
+
+    border:2px dashed transparent;
+
+}
+
+
+
+#iframeSource.edition {
+
+    border-color:white;
+
+    cursor:move;
+
+}
+
+
+
+#iframeSource iframe {
 
     width:100%;
     height:100%;
@@ -56,164 +74,124 @@
 }
 
 
-/* poignées */
-.handle {
 
-    position:absolute;
+#iframeSource.edition iframe {
 
-    width:14px;
-    height:14px;
-
-    background:white;
-
-    display:none;
+    pointer-events:none;
 
 }
 
-
-#top-left {
-    left:-7px;
-    top:-7px;
-    cursor:nwse-resize;
-}
-
-#top-right {
-    right:-7px;
-    top:-7px;
-    cursor:nesw-resize;
-}
-
-#bottom-left {
-    left:-7px;
-    bottom:-7px;
-    cursor:nesw-resize;
-}
-
-#bottom-right {
-    right:-7px;
-    bottom:-7px;
-    cursor:nwse-resize;
-}
 
 
 </style>
 
 
 
-<div id="tools">
+<div id="controleIframe">
 
 <button id="lock">
 🔓 Déverrouiller
 </button>
 
 
-<select id="ratio">
+<select id="format">
 
 <option value="screen">
 Adapter écran
 </option>
 
-<option value="4:3">
+<option value="4/3">
 4:3
 </option>
 
-<option value="16:9">
+<option value="16/9">
 16:9
 </option>
 
-<option value="1:1">
-Carré
+<option value="16/10">
+16:10
+</option>
+
+<option value="21/9">
+21:9
+</option>
+
+<option value="1/1">
+1:1
 </option>
 
 </select>
 
-
 </div>
+
 
 
 <script>
 
-const box = document.getElementById("iframe-container");
-const lockBtn = document.getElementById("lock");
-const ratio = document.getElementById("ratio");
+const box = document.getElementById("iframeSource");
+const lock = document.getElementById("lock");
+const format = document.getElementById("format");
 
 
-let locked = true;
-
-let dragging=false;
-
-let startX,startY,startLeft,startTop;
+let unlocked = true;
 
 
 
-function setLock(){
+// verrouillage
 
-    if(locked){
+lock.onclick = ()=>{
 
-        locked=false;
+unlocked=!unlocked;
 
-        lockBtn.innerHTML="🔒 Verrouiller";
 
-        box.style.border="2px dashed red";
+if(unlocked){
 
-        document.querySelectorAll(".handle")
-        .forEach(h=>h.style.display="block");
-
-        box.style.cursor="move";
-
-    }
-
-    else{
-
-        locked=true;
-
-        lockBtn.innerHTML="🔓 Déverrouiller";
-
-        box.style.border="0";
-
-        document.querySelectorAll(".handle")
-        .forEach(h=>h.style.display="none");
-
-    }
+box.classList.add("edition");
+lock.innerHTML="🔓 Déverrouiller";
 
 }
 
+else{
 
-lockBtn.onclick=setLock;
+box.classList.remove("edition");
+lock.innerHTML="🔒 Verrouillé";
+
+}
+
+};
 
 
 
-/* déplacement */
+
+
+// déplacement souris
+
+let move=false;
+let x,y;
+
 
 box.onmousedown=e=>{
 
-if(locked)return;
+if(!unlocked)return;
 
 
-dragging=true;
+move=true;
 
-startX=e.clientX;
-startY=e.clientY;
-
-startLeft=box.offsetLeft;
-startTop=box.offsetTop;
+x=e.clientX-box.offsetLeft;
+y=e.clientY-box.offsetTop;
 
 
 };
 
 
+
 document.onmousemove=e=>{
 
-
-if(!dragging)return;
-
-
-box.style.left=
-startLeft+(e.clientX-startX)+"px";
+if(!move)return;
 
 
-box.style.top=
-startTop+(e.clientY-startY)+"px";
+box.style.left=(e.clientX-x)+"px";
+box.style.top=(e.clientY-y)+"px";
 
 
 };
@@ -221,115 +199,83 @@ startTop+(e.clientY-startY)+"px";
 
 document.onmouseup=()=>{
 
-dragging=false;
+move=false;
 
 };
 
 
 
 
-/* formats */
 
-ratio.onchange=()=>{
+
+
+// formats
+
+format.onchange=()=>{
 
 
 let w=window.innerWidth;
 let h=window.innerHeight;
 
 
-if(ratio.value=="screen"){
+switch(format.value){
+
+
+case "screen":
 
 box.style.width=w+"px";
 box.style.height=h+"px";
 
-}
+break;
 
 
-if(ratio.value=="16:9"){
 
-box.style.width="1920px";
-box.style.height="1080px";
-
-}
-
-
-if(ratio.value=="4:3"){
+case "4/3":
 
 box.style.width="1440px";
 box.style.height="1080px";
 
-}
+break;
 
 
-if(ratio.value=="1:1"){
+
+case "16/9":
+
+box.style.width="1920px";
+box.style.height="1080px";
+
+break;
+
+
+
+case "16/10":
+
+box.style.width="1920px";
+box.style.height="1200px";
+
+break;
+
+
+
+case "21/9":
+
+box.style.width="2560px";
+box.style.height="1080px";
+
+break;
+
+
+
+case "1/1":
 
 box.style.width="1080px";
 box.style.height="1080px";
 
-}
+break;
 
-
-};
-
-
-
-/* redimension coins */
-
-let resizing=false;
-let corner;
-
-
-document.querySelectorAll(".handle")
-.forEach(h=>{
-
-
-h.onmousedown=e=>{
-
-if(locked)return;
-
-resizing=true;
-
-corner=h.id;
-
-startX=e.clientX;
-startY=e.clientY;
-
-e.stopPropagation();
-
-};
-
-
-});
-
-
-document.onmousemove=e=>{
-
-
-if(!resizing)return;
-
-
-let dx=e.clientX-startX;
-let dy=e.clientY-startY;
-
-
-if(corner=="bottom-right"){
-
-box.style.width=
-box.offsetWidth+dx+"px";
-
-box.style.height=
-box.offsetHeight+dy+"px";
 
 }
 
-
-};
-
-
-
-document.onmouseup=()=>{
-
-resizing=false;
 
 };
 
@@ -398,15 +344,13 @@ resizing=false;
 
 <!-- DESIGN CANVA INCHANGÉ -->
 
-<div id="iframe-container">
+<div id="iframeSource">
     <iframe 
         src="https://timmy25px.github.io/iframe-canva-2/"
         allowfullscreen>
     </iframe>
 </div>
-
-};
-
+    
 </script>
 
 <audio id="mainMusic" loop>
