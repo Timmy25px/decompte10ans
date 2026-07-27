@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -16,7 +17,6 @@ html, body {
 body {
     min-height: 200vh;
 }
-
 #lockScreen {
     position: fixed;
     inset: 0;
@@ -298,20 +298,21 @@ timer();
 
 
 </script>
-    <style>
+
+<style>
 @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap');
 
-.counter-container {
-    position: fixed;
-    left: 0;
+#overlayCounter {
+    position: absolute;
     bottom: 30px;
+    left: 0;
     width: 100%;
     display: flex;
     justify-content: center;
-    pointer-events: none;
-    z-index: 9999;
     font-family: 'Lato', sans-serif;
-    color: #fff;
+    color: white;
+    pointer-events: none;
+    z-index: 1000;
 }
 
 .counter {
@@ -340,8 +341,11 @@ timer();
 }
 </style>
 
-<div class="counter-container">
+
+<div id="overlayCounter">
+
     <div class="counter">
+
         <div class="block"><div class="value" id="years">0</div><div class="label">ANNÉES</div></div>
         <div class="block"><div class="value" id="months">0</div><div class="label">MOIS</div></div>
         <div class="block"><div class="value" id="weeks">0</div><div class="label">SEMAINES</div></div>
@@ -349,13 +353,18 @@ timer();
         <div class="block"><div class="value" id="hours">0</div><div class="label">HEURES</div></div>
         <div class="block"><div class="value" id="minutes">0</div><div class="label">MINUTES</div></div>
         <div class="block"><div class="value" id="seconds">0</div><div class="label">SECONDES</div></div>
+
     </div>
+
 </div>
 
+
 <script>
+
 const startDate = new Date(Date.UTC(2022, 7, 28, 13, 44, 0));
 
 function updateCounter() {
+
     const now = new Date();
     let diff = Math.floor((now - startDate) / 1000);
 
@@ -375,9 +384,8 @@ function updateCounter() {
     diff -= hours * 3600;
 
     const minutes = Math.floor(diff / 60);
-    diff -= minutes * 60;
+    const seconds = diff - minutes * 60;
 
-    const seconds = diff;
 
     document.getElementById("years").textContent = years;
     document.getElementById("months").textContent = months;
@@ -386,13 +394,12 @@ function updateCounter() {
     document.getElementById("hours").textContent = hours;
     document.getElementById("minutes").textContent = minutes;
     document.getElementById("seconds").textContent = seconds;
+
 }
 
 updateCounter();
-setInterval(updateCounter, 1000);
-</script>
-</body>
-<html>
+setInterval(updateCounter,1000);
 
+</script>
 </body>
 </html>
