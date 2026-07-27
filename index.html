@@ -15,18 +15,16 @@ html, body {
 }
 
 body {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
+    display: block !important;
 }
 
 iframe {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
     display: block !important;
+    position: fixed !important;
+    top: -5px !important;
+    left: 0 !important;
     width: 100vw !important;
-    height: 100vh !important;
+    height: calc(100vh + 5px) !important;
     border: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
