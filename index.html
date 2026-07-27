@@ -6,45 +6,53 @@
 <title>Compteur</title>
 
 <style>
-html,body{
+/* Menu taille écran */
 
-margin:0;
-padding:0;
+#sizeMenu {
+    position: fixed;
+    top: 20px;
+    left: 160px;
 
-width:100%;
-height:100%;
+    z-index: 99999;
 
-overflow:hidden;
+    padding: 8px 12px;
 
-background:black;
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+
+    background: white;
+    color: black;
+
+    border-radius: 6px;
+    border: 1px solid #777;
+
+    cursor: pointer;
+}
+
+
+/* bouton verrouillage */
+
+#lock {
+    position: fixed;
+
+    top: 20px;
+    left: 20px;
+
+    z-index: 99999;
+
+    padding: 8px 15px;
+
+    border-radius: 6px;
+
+    cursor: pointer;
 
 }
 
 
+/* caché quand verrouillé */
 
-#canvasEditor{
-
-position:absolute;
-
-left:0px;
-top:0px;
-
-width:1920px;
-height:1080px;
-
-}
-
-
-
-#canvaFrame{
-
-width:100%;
-height:100%;
-
-border:0;
-
-pointer-events:none;
-
+.locked-mode #sizeMenu {
+    display:none;
 }
     
 #lockScreen {
@@ -125,81 +133,89 @@ pointer-events:none;
 
 <!-- DESIGN CANVA INCHANGÉ -->
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/moveable/dist/moveable.min.css">
-
-<div id="canvasEditor">
-
-    <iframe id="canvaFrame"
-    src="https://timmy25px.github.io/iframe-canva-2/">
-    </iframe>
-
-</div>
-
 <button id="lock">
 🔒 Verrouiller
 </button>
 
 
-<script src="https://cdn.jsdelivr.net/npm/moveable/dist/moveable.min.js"></script>
+<select id="sizeMenu">
+
+<option value="1920x1080">
+Adapter à l'écran (16:9)
+</option>
+
+<option value="1280x720">
+1280x720 HD
+</option>
+
+<option value="1024x576">
+1024x576
+</option>
+
+<option value="800x450">
+800x450
+</option>
+
+<option value="1440x1080">
+4:3 HD
+</option>
+
+<option value="1024x768">
+4:3 classique
+</option>
+
+<option value="640x480">
+4:3 ancien
+</option>
+
+</select>
+
+
+<div id="canvasEditor">
+
+<iframe id="canvaFrame"
+src="https://timmy25px.github.io/iframe-canva-2/">
+</iframe>
+
+</div>
+
+
 
 <script>
 
-let verrouille = false;
+const menu = document.getElementById("sizeMenu");
+const editor = document.getElementById("canvasEditor");
+const lockButton = document.getElementById("lock");
 
 
-const target = document.querySelector("#canvasEditor");
-
-
-const moveable = new Moveable(document.body,{
-    target: target,
-
-    draggable:true,
-    resizable:true,
-
-    keepRatio:false,
-
-    edge:true,
-
-    origin:false
-});
+let locked = false;
 
 
 
-moveable.on("drag", e=>{
+menu.onchange = function(){
 
-    if(verrouille) return;
-
-    e.target.style.transform=e.transform;
-
-});
+    if(locked) return;
 
 
-
-moveable.on("resize", e=>{
-
-    if(verrouille) return;
+    let size=this.value.split("x");
 
 
-    e.target.style.width=e.width+"px";
-    e.target.style.height=e.height+"px";
+    editor.style.width=size[0]+"px";
+    editor.style.height=size[1]+"px";
 
-
-    e.target.style.transform=e.drag.transform;
-
-});
+};
 
 
 
+lockButton.onclick=function(){
 
 
-document.getElementById("lock").onclick=function(){
-
-    verrouille=!verrouille;
+    locked=!locked;
 
 
-    if(verrouille){
+    if(locked){
 
-        moveable.target=null;
+        document.body.classList.add("locked-mode");
 
         this.innerHTML="🔓 Déverrouiller";
 
@@ -207,17 +223,16 @@ document.getElementById("lock").onclick=function(){
 
     else{
 
-        moveable.target=target;
+        document.body.classList.remove("locked-mode");
 
         this.innerHTML="🔒 Verrouiller";
 
     }
 
+
 };
 
-
 </script>
-
 
 <audio id="mainMusic" loop>
     <source src="https://res.cloudinary.com/zp5nbve7/video/upload/v1784754618/ezyZip_bxpow8.mp4">
