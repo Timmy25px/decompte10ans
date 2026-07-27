@@ -243,55 +243,73 @@ body {
 
 
 <script>
-const startDate = new Date(Date.UTC(2022, 7, 28, 13, 44, 0));
+const startDate = new Date(Date.UTC(2032, 7, 28, 13, 44, 0));
 
 function updateCounter() {
 
-    let diff = Math.floor((new Date() - startDate) / 1000);
+    const now = new Date();
 
-    const years = Math.floor(diff / (365.25 * 24 * 3600));
-    diff -= years * 365.25 * 24 * 3600;
+    let years = now.getUTCFullYear() - startDate.getUTCFullYear();
 
-    const months = Math.floor(diff / (30.44 * 24 * 3600));
-    diff -= months * 30.44 * 24 * 3600;
+    let anniversary = new Date(Date.UTC(
+        startDate.getUTCFullYear() + years,
+        startDate.getUTCMonth(),
+        startDate.getUTCDate(),
+        startDate.getUTCHours(),
+        startDate.getUTCMinutes(),
+        startDate.getUTCSeconds()
+    ));
+
+    // Si l'anniversaire n'est pas encore passé cette année
+    if (now < anniversary) {
+        years--;
+        anniversary = new Date(Date.UTC(
+            startDate.getUTCFullYear() + years,
+            startDate.getUTCMonth(),
+            startDate.getUTCDate(),
+            startDate.getUTCHours(),
+            startDate.getUTCMinutes(),
+            startDate.getUTCSeconds()
+        ));
+    }
+
+
+    let diff = Math.floor((now - anniversary) / 1000);
+
+
+    const months = Math.floor(diff / (30 * 24 * 3600));
+    diff -= months * 30 * 24 * 3600;
+
 
     const weeks = Math.floor(diff / (7 * 24 * 3600));
     diff -= weeks * 7 * 24 * 3600;
 
+
     const days = Math.floor(diff / (24 * 3600));
     diff -= days * 24 * 3600;
+
 
     const hours = Math.floor(diff / 3600);
     diff -= hours * 3600;
 
+
     const minutes = Math.floor(diff / 60);
-    const seconds = diff % 60;
+    const seconds = diff - minutes * 60;
 
 
-    yearsEl.textContent = years;
-    monthsEl.textContent = months;
-    weeksEl.textContent = weeks;
-    daysEl.textContent = days;
-    hoursEl.textContent = hours;
-    minutesEl.textContent = minutes;
-    secondsEl.textContent = seconds;
+    document.getElementById("years").textContent = years;
+    document.getElementById("months").textContent = months;
+    document.getElementById("weeks").textContent = weeks;
+    document.getElementById("days").textContent = days;
+    document.getElementById("hours").textContent = hours;
+    document.getElementById("minutes").textContent = minutes;
+    document.getElementById("seconds").textContent = seconds;
 
 }
-
-
-const yearsEl = document.getElementById("years");
-const monthsEl = document.getElementById("months");
-const weeksEl = document.getElementById("weeks");
-const daysEl = document.getElementById("days");
-const hoursEl = document.getElementById("hours");
-const minutesEl = document.getElementById("minutes");
-const secondsEl = document.getElementById("seconds");
-
 
 updateCounter();
 setInterval(updateCounter,1000);
 </script>
-
 </div>
 
 <a href="https://www.canva.com/design/DAHQHalUtOM/VW_lvRTYlOogieRFHmu3SA/view?utm_content=DAHQHalUtOM&utm_campaign=designshare&utm_medium=embeds&utm_source=link" target="_blank" rel="noopener"> _</a> par Tim Gaudinaud
