@@ -6,19 +6,64 @@
 <title>Compteur</title>
 
 <style>
-html,body{
-    margin:0;
-    padding:0;
-    overflow:hidden;
-    background:black;
+#obsToolbar {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 999999;
+
+    display: flex;
+    gap: 10px;
+
+    padding: 12px;
+
+    background: rgba(20,20,20,0.85);
+    backdrop-filter: blur(10px);
+
+    border-radius: 18px;
 }
 
 
-/* SOURCE COMME OBS */
+/* boutons style moderne */
 
-#sourceIframe{
+.obsButton,
+#formatSelect {
 
-    position:absolute;
+    height: 45px;
+
+    padding: 0 18px;
+
+    border-radius: 12px;
+
+    border: 9px solid transparent;
+
+    border-image: linear-gradient(
+        90deg,
+        #8C52FF,
+        #FF914D
+    ) 1;
+
+    background: linear-gradient(
+        90deg,
+        #FF66C4,
+        #FFDE59
+    );
+
+    color: white;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    font-size: 15px;
+
+}
+
+
+
+#sourceIframe {
+
+    position: absolute;
 
     left:100px;
     top:100px;
@@ -28,20 +73,10 @@ html,body{
 
     overflow:hidden;
 
-    border:9px solid transparent;
-
-    border-image:linear-gradient(
-        90deg,
-        #8C52FF,
-        #FF914D
-    ) 1;
-
-    box-sizing:border-box;
-
 }
 
 
-#sourceIframe iframe{
+#sourceIframe iframe {
 
     width:100%;
     height:100%;
@@ -54,97 +89,7 @@ html,body{
 
 
 
-/* MODE VERROUILLÉ */
-
-.locked{
-
-    border-color:transparent !important;
-
-}
-
-
-
-/* BARRE OUTILS */
-
-#obsToolbar{
-
-    position:fixed;
-
-    top:20px;
-    left:20px;
-
-    z-index:99999;
-
-    display:flex;
-
-    gap:10px;
-
-    padding:12px;
-
-    border-radius:16px;
-
-    background:rgba(20,20,20,.85);
-
-    backdrop-filter:blur(10px);
-
-}
-
-
-
-/* BOUTONS */
-
-.obsButton,
-#formatSelect{
-
-    height:45px;
-
-    padding:0 18px;
-
-    border-radius:12px;
-
-    border:4px solid transparent;
-
-    border-image:linear-gradient(
-        90deg,
-        #8C52FF,
-        #FF914D
-    ) 1;
-
-
-    background:linear-gradient(
-        90deg,
-        #FF66C4,
-        #FFDE59
-    );
-
-
-    color:white;
-
-    font-size:16px;
-
-    font-weight:bold;
-
-    cursor:pointer;
-
-    text-shadow:
-    0 1px 3px black;
-
-
-}
-
-
-.obsButton:hover,
-#formatSelect:hover{
-
-    filter:brightness(1.1);
-
-}
-
-
-
-/* POIGNÉES */
-
-.handle{
+.handle {
 
     position:absolute;
 
@@ -155,87 +100,68 @@ html,body{
 
     border:2px solid black;
 
-    z-index:20;
-
     display:none;
 
 }
 
 
 
-.edit .handle{
+.edit .handle {
 
     display:block;
 
 }
 
 
-.tl{
-    top:-7px;
-    left:-7px;
-    cursor:nwse-resize;
+.tl {
+top:-7px;
+left:-7px;
 }
 
-.tr{
-    top:-7px;
-    right:-7px;
-    cursor:nesw-resize;
+.tr {
+top:-7px;
+right:-7px;
 }
 
-.bl{
-    bottom:-7px;
-    left:-7px;
-    cursor:nesw-resize;
+.bl {
+bottom:-7px;
+left:-7px;
 }
 
-.br{
-    bottom:-7px;
-    right:-7px;
-    cursor:nwse-resize;
+.br {
+bottom:-7px;
+right:-7px;
 }
-
 
 
 </style>
 
 
-
 <script>
 
-
-window.onload=function(){
-
+window.addEventListener("load",()=>{
 
 
-const box=document.getElementById("sourceIframe");
+const box=document.querySelector("#sourceIframe");
 
 
+/* sécurité si iframe absente */
 
-/* ajout poignées */
-
-["tl","tr","bl","br"].forEach(c=>{
-
-let h=document.createElement("div");
-
-h.className="handle "+c;
-
-box.appendChild(h);
-
-
-});
+if(!box){
+    console.log("sourceIframe introuvable");
+    return;
+}
 
 
 
+/* création menu */
+
+let menu=document.createElement("div");
+
+menu.id="obsToolbar";
 
 
-/* barre */
-
-let toolbar=document.createElement("div");
-
-toolbar.id="obsToolbar";
-
-
-toolbar.innerHTML=`
+menu.innerHTML=`
 
 <button class="obsButton" id="lockBtn">
 🔓 Déverrouiller
@@ -244,28 +170,13 @@ toolbar.innerHTML=`
 
 <select id="formatSelect">
 
-<option>
-Adapter écran
-</option>
-
-<option>
-16:9
-</option>
-
-<option>
-4:3
-</option>
-
-<option>
-16:10
-</option>
-
-<option>
-21:9
-</option>
+<option>Adapter écran</option>
+<option>16:9</option>
+<option>4:3</option>
+<option>16:10</option>
+<option>21:9</option>
 
 </select>
-
 
 
 <button class="obsButton" id="cropBtn">
@@ -274,8 +185,23 @@ Adapter écran
 
 `;
 
-document.body.appendChild(toolbar);
 
+document.body.appendChild(menu);
+
+
+
+
+/* poignées */
+
+["tl","tr","bl","br"].forEach(pos=>{
+
+let h=document.createElement("div");
+
+h.className="handle "+pos;
+
+box.appendChild(h);
+
+});
 
 
 
@@ -283,8 +209,7 @@ document.body.appendChild(toolbar);
 let unlocked=true;
 
 
-
-document.getElementById("lockBtn").onclick=function(){
+document.querySelector("#lockBtn").onclick=()=>{
 
 
 unlocked=!unlocked;
@@ -294,7 +219,8 @@ if(unlocked){
 
 box.classList.add("edit");
 
-this.innerHTML="🔓 Déverrouiller";
+document.querySelector("#lockBtn").textContent=
+"🔓 Déverrouiller";
 
 }
 
@@ -302,7 +228,8 @@ else{
 
 box.classList.remove("edit");
 
-this.innerHTML="🔒 Verrouillé";
+document.querySelector("#lockBtn").textContent=
+"🔒 Verrouillé";
 
 }
 
@@ -315,15 +242,13 @@ this.innerHTML="🔒 Verrouillé";
 
 /* déplacement */
 
+let moving=false;
 
-let move=false;
-
-let offsetX=0;
-let offsetY=0;
-
+let startX=0;
+let startY=0;
 
 
-box.onmousedown=function(e){
+box.addEventListener("mousedown",e=>{
 
 
 if(!unlocked)return;
@@ -333,42 +258,38 @@ if(e.target.classList.contains("handle"))
 return;
 
 
-move=true;
+moving=true;
 
 
-offsetX=e.clientX-box.offsetLeft;
-offsetY=e.clientY-box.offsetTop;
+startX=e.clientX-box.offsetLeft;
+startY=e.clientY-box.offsetTop;
 
 
-};
-
-
-
-document.onmousemove=function(e){
-
-
-if(move){
-
-box.style.left=
-(e.clientX-offsetX)+"px";
-
-
-box.style.top=
-(e.clientY-offsetY)+"px";
-
-
-}
-
-
-};
+});
 
 
 
-document.onmouseup=function(){
+document.addEventListener("mousemove",e=>{
 
-move=false;
 
-};
+if(!moving)return;
+
+
+box.style.left=(e.clientX-startX)+"px";
+
+box.style.top=(e.clientY-startY)+"px";
+
+
+});
+
+
+
+document.addEventListener("mouseup",()=>{
+
+moving=false;
+
+});
+
 
 
 
@@ -376,11 +297,11 @@ move=false;
 
 /* formats */
 
+document.querySelector("#formatSelect")
+.addEventListener("change",e=>{
 
-document.getElementById("formatSelect").onchange=function(){
 
-
-switch(this.value){
+switch(e.target.value){
 
 
 case"Adapter écran":
@@ -391,12 +312,14 @@ box.style.height="100vh";
 break;
 
 
+
 case"16:9":
 
 box.style.width="1920px";
 box.style.height="1080px";
 
 break;
+
 
 
 case"4:3":
@@ -407,12 +330,14 @@ box.style.height="1080px";
 break;
 
 
+
 case"16:10":
 
 box.style.width="1920px";
 box.style.height="1200px";
 
 break;
+
 
 
 case"21:9":
@@ -426,28 +351,36 @@ break;
 }
 
 
-};
+
+});
 
 
 
-document.getElementById("cropBtn").onclick=function(){
 
 
-if(box.style.clipPath){
+/* crop */
 
-box.style.clipPath="";
+let cropped=false;
 
-this.innerHTML="✂️ Crop";
 
-}
+document.querySelector("#cropBtn").onclick=e=>{
 
-else{
 
-box.style.clipPath="inset(50px 50px 50px 50px)";
+cropped=!cropped;
 
-this.innerHTML="✂️ Crop ON";
 
-}
+box.style.clipPath =
+cropped ?
+"inset(50px 50px 50px 50px)"
+:
+"none";
+
+
+e.target.textContent =
+cropped ?
+"✂️ Crop ON"
+:
+"✂️ Crop";
 
 
 };
@@ -457,7 +390,7 @@ this.innerHTML="✂️ Crop ON";
 box.classList.add("edit");
 
 
-};
+});
 
 #lockScreen input {
     padding: 10px;
@@ -718,312 +651,6 @@ function timer(){
 
 
 timer();
-
-
-</script>
-<style>
-
-html, body {
-    margin:0;
-    padding:0;
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:#000;
-}
-
-
-#sourceIframe {
-
-    position:absolute;
-
-    left:0;
-    top:0;
-
-    width:100vw;
-    height:100vh;
-
-    overflow:hidden;
-
-    box-sizing:border-box;
-
-}
-
-
-
-#sourceIframe iframe {
-
-    width:100%;
-    height:100%;
-
-    border:0;
-
-    display:block;
-
-}
-
-
-
-#obsToolbar {
-
-    position:fixed;
-
-    top:20px;
-    left:20px;
-
-    z-index:999999;
-
-    display:flex;
-
-    gap:10px;
-
-    padding:12px;
-
-    border-radius:16px;
-
-    background:rgba(0,0,0,.6);
-
-}
-
-
-
-.obsButton,
-#formatSelect {
-
-    padding:10px 18px;
-
-    border-radius:12px;
-
-    border:9px solid;
-
-    border-image:
-    linear-gradient(
-        90deg,
-        #8C52FF,
-        #FF914D
-    ) 1;
-
-    background:
-    linear-gradient(
-        90deg,
-        #FF66C4,
-        #FFDE59
-    );
-
-    color:white;
-
-    font-weight:bold;
-
-    cursor:pointer;
-
-}
-
-
-.edit {
-
-    outline:
-    9px solid transparent;
-
-    outline-offset:-9px;
-
-}
-
-
-</style>
-
-
-
-<script>
-
-window.addEventListener("load",()=>{
-
-
-const box=document.getElementById("sourceIframe");
-
-
-if(!box){
-    console.log("sourceIframe introuvable");
-    return;
-}
-
-
-
-let unlocked=true;
-
-
-
-const toolbar=document.createElement("div");
-
-toolbar.id="obsToolbar";
-
-
-toolbar.innerHTML=`
-
-<button class="obsButton" id="lockBtn">
-🔓 Déverrouiller
-</button>
-
-<select id="formatSelect">
-
-<option>Adapter écran</option>
-<option>16:9</option>
-<option>4:3</option>
-<option>16:10</option>
-<option>21:9</option>
-
-</select>
-
-
-<button class="obsButton" id="cropBtn">
-✂️ Crop
-</button>
-
-`;
-
-
-document.body.appendChild(toolbar);
-
-
-
-let lockBtn=document.getElementById("lockBtn");
-
-
-
-lockBtn.onclick=()=>{
-
-
-unlocked=!unlocked;
-
-
-if(unlocked){
-
-box.classList.add("edit");
-
-lockBtn.innerHTML="🔓 Déverrouiller";
-
-}
-
-else{
-
-box.classList.remove("edit");
-
-lockBtn.innerHTML="🔒 Verrouillé";
-
-}
-
-
-};
-
-
-
-
-
-// déplacement
-
-let move=false;
-let ox=0;
-let oy=0;
-
-
-
-box.onmousedown=e=>{
-
-
-if(!unlocked)return;
-
-
-move=true;
-
-
-ox=e.clientX-box.offsetLeft;
-oy=e.clientY-box.offsetTop;
-
-
-};
-
-
-
-document.onmousemove=e=>{
-
-
-if(move){
-
-box.style.left=(e.clientX-ox)+"px";
-box.style.top=(e.clientY-oy)+"px";
-
-}
-
-
-};
-
-
-
-document.onmouseup=()=>{
-
-move=false;
-
-};
-
-
-
-
-
-// formats
-
-document.getElementById("formatSelect").onchange=function(){
-
-
-switch(this.value){
-
-
-case"Adapter écran":
-
-box.style.width="100vw";
-box.style.height="100vh";
-
-break;
-
-
-case"16:9":
-
-box.style.width="1920px";
-box.style.height="1080px";
-
-break;
-
-
-case"4:3":
-
-box.style.width="1440px";
-box.style.height="1080px";
-
-break;
-
-
-case"16:10":
-
-box.style.width="1920px";
-box.style.height="1200px";
-
-break;
-
-
-case"21:9":
-
-box.style.width="2560px";
-box.style.height="1080px";
-
-break;
-
-
-}
-
-
-};
-
-
-
-});
 
 </script>
 </body>
