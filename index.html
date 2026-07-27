@@ -164,6 +164,137 @@ body {
     allowfullscreen="allowfullscreen"
     allow="fullscreen">
 </iframe>
+#overlayCounter {
+    position: absolute;
+    left: 50%;
+    bottom: 25px;
+    transform: translateX(-50%);
+    width: 1920px;
+    display: flex;
+    justify-content: center;
+    font-family: 'Lato', sans-serif;
+    color: white;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.counter {
+    display: flex;
+    gap: 22px;
+    text-align: center;
+}
+
+.block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.value {
+    font-size: 2.1rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
+
+.label {
+    font-size: 0.65rem;
+    margin-top: 4px;
+    opacity: 0.75;
+    letter-spacing: 0.25em;
+}
+<div class="overlay-counter">
+
+  <div class="counter">
+
+    <div class="block">
+      <div class="value" id="years">0</div>
+      <div class="label">ANNÉES</div>
+    </div>
+
+    <div class="block">
+      <div class="value" id="months">0</div>
+      <div class="label">MOIS</div>
+    </div>
+
+    <div class="block">
+      <div class="value" id="weeks">0</div>
+      <div class="label">SEMAINES</div>
+    </div>
+
+    <div class="block">
+      <div class="value" id="days">0</div>
+      <div class="label">JOURS</div>
+    </div>
+
+    <div class="block">
+      <div class="value" id="hours">0</div>
+      <div class="label">HEURES</div>
+    </div>
+
+    <div class="block">
+      <div class="value" id="minutes">0</div>
+      <div class="label">MINUTES</div>
+    </div>
+
+    <div class="block">
+      <div class="value" id="seconds">0</div>
+      <div class="label">SECONDES</div>
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+const startDate = new Date(Date.UTC(2022, 7, 28, 13, 44, 0));
+
+function updateCounter() {
+
+    let diff = Math.floor((new Date() - startDate) / 1000);
+
+    const years = Math.floor(diff / (365.25 * 24 * 3600));
+    diff -= years * 365.25 * 24 * 3600;
+
+    const months = Math.floor(diff / (30.44 * 24 * 3600));
+    diff -= months * 30.44 * 24 * 3600;
+
+    const weeks = Math.floor(diff / (7 * 24 * 3600));
+    diff -= weeks * 7 * 24 * 3600;
+
+    const days = Math.floor(diff / (24 * 3600));
+    diff -= days * 24 * 3600;
+
+    const hours = Math.floor(diff / 3600);
+    diff -= hours * 3600;
+
+    const minutes = Math.floor(diff / 60);
+    const seconds = diff % 60;
+
+
+    yearsEl.textContent = years;
+    monthsEl.textContent = months;
+    weeksEl.textContent = weeks;
+    daysEl.textContent = days;
+    hoursEl.textContent = hours;
+    minutesEl.textContent = minutes;
+    secondsEl.textContent = seconds;
+
+}
+
+
+const yearsEl = document.getElementById("years");
+const monthsEl = document.getElementById("months");
+const weeksEl = document.getElementById("weeks");
+const daysEl = document.getElementById("days");
+const hoursEl = document.getElementById("hours");
+const minutesEl = document.getElementById("minutes");
+const secondsEl = document.getElementById("seconds");
+
+
+updateCounter();
+setInterval(updateCounter,1000);
+</script>
 
 </div>
 
@@ -362,136 +493,5 @@ timer();
 </script>
 
 <style>
-#overlayCounter {
-    position: absolute;
-    left: 50%;
-    bottom: 25px;
-    transform: translateX(-50%);
-    width: 1920px;
-    display: flex;
-    justify-content: center;
-    font-family: 'Lato', sans-serif;
-    color: white;
-    pointer-events: none;
-    z-index: 1000;
-}
-
-.counter {
-    display: flex;
-    gap: 22px;
-    text-align: center;
-}
-
-.block {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.value {
-    font-size: 2.1rem;
-    font-weight: 700;
-    letter-spacing: 0.03em;
-}
-
-.label {
-    font-size: 0.65rem;
-    margin-top: 4px;
-    opacity: 0.75;
-    letter-spacing: 0.25em;
-}
-<div class="overlay-counter">
-
-  <div class="counter">
-
-    <div class="block">
-      <div class="value" id="years">0</div>
-      <div class="label">ANNÉES</div>
-    </div>
-
-    <div class="block">
-      <div class="value" id="months">0</div>
-      <div class="label">MOIS</div>
-    </div>
-
-    <div class="block">
-      <div class="value" id="weeks">0</div>
-      <div class="label">SEMAINES</div>
-    </div>
-
-    <div class="block">
-      <div class="value" id="days">0</div>
-      <div class="label">JOURS</div>
-    </div>
-
-    <div class="block">
-      <div class="value" id="hours">0</div>
-      <div class="label">HEURES</div>
-    </div>
-
-    <div class="block">
-      <div class="value" id="minutes">0</div>
-      <div class="label">MINUTES</div>
-    </div>
-
-    <div class="block">
-      <div class="value" id="seconds">0</div>
-      <div class="label">SECONDES</div>
-    </div>
-
-  </div>
-
-</div>
-
-
-<script>
-const startDate = new Date(Date.UTC(2022, 7, 28, 13, 44, 0));
-
-function updateCounter() {
-
-    let diff = Math.floor((new Date() - startDate) / 1000);
-
-    const years = Math.floor(diff / (365.25 * 24 * 3600));
-    diff -= years * 365.25 * 24 * 3600;
-
-    const months = Math.floor(diff / (30.44 * 24 * 3600));
-    diff -= months * 30.44 * 24 * 3600;
-
-    const weeks = Math.floor(diff / (7 * 24 * 3600));
-    diff -= weeks * 7 * 24 * 3600;
-
-    const days = Math.floor(diff / (24 * 3600));
-    diff -= days * 24 * 3600;
-
-    const hours = Math.floor(diff / 3600);
-    diff -= hours * 3600;
-
-    const minutes = Math.floor(diff / 60);
-    const seconds = diff % 60;
-
-
-    yearsEl.textContent = years;
-    monthsEl.textContent = months;
-    weeksEl.textContent = weeks;
-    daysEl.textContent = days;
-    hoursEl.textContent = hours;
-    minutesEl.textContent = minutes;
-    secondsEl.textContent = seconds;
-
-}
-
-
-const yearsEl = document.getElementById("years");
-const monthsEl = document.getElementById("months");
-const weeksEl = document.getElementById("weeks");
-const daysEl = document.getElementById("days");
-const hoursEl = document.getElementById("hours");
-const minutesEl = document.getElementById("minutes");
-const secondsEl = document.getElementById("seconds");
-
-
-updateCounter();
-setInterval(updateCounter,1000);
-</script>
 </body>
 </html>
