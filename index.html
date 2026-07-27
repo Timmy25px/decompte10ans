@@ -23,13 +23,7 @@ iframe {
     border: 0;
     transform: translateY(-50px);
 }
-body {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-}
+
 #lockScreen {
     position: fixed;
     inset: 0;
@@ -72,40 +66,6 @@ body {
     border-radius: 8px;
     cursor: pointer;
 }
-.overlay-counter {
-    position: absolute;
-    left: 40px;
-    bottom: 30px;
-    z-index: 1000;
-    color: black;
-    font-family: 'Lato', sans-serif;
-    pointer-events: none;
-}
-
-.overlay-counter .counter {
-    display: flex;
-    gap: 22px;
-    text-align: center;
-}
-
-.overlay-counter .block {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.overlay-counter .value {
-    font-size: 2.1rem;
-    font-weight: 700;
-    letter-spacing: 0.03em;
-}
-
-.overlay-counter .label {
-    font-size: 0.65rem;
-    margin-top: 4px;
-    opacity: 0.75;
-    letter-spacing: 0.25em;
-}
 
 #whiteFade {
     position: fixed;
@@ -131,7 +91,7 @@ body {
 
     <div id="error"></div>
 
-}
+</div>
 
 
 <button id="playButton">▶ Play</button>
@@ -146,23 +106,12 @@ body {
  padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden;
  border-radius: 8px; will-change: transform;">
 
-<iframe 
-    loading="lazy"
-    src="https://www.canva.com/design/DAHQHalUtOM/VW_lvRTYlOogieRFHmu3SA/view?embed"
-    style="
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        border: none;
-        margin: 0;
-        padding: 0;
-        display: block;
-    "
-    allowfullscreen="allowfullscreen"
-    allow="fullscreen">
-</iframe>
+  <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
+    src="https://www.canva.com/design/DAHQHalUtOM/VW_lvRTYlOogieRFHmu3SA/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
+  </iframe>
+
+</div>
+
 <a href="https://www.canva.com/design/DAHQHalUtOM/VW_lvRTYlOogieRFHmu3SA/view?utm_content=DAHQHalUtOM&utm_campaign=designshare&utm_medium=embeds&utm_source=link" target="_blank" rel="noopener"> _</a> par Tim Gaudinaud
 
 
@@ -356,5 +305,7 @@ timer();
 
 
 </script>
+
+
 </body>
 </html>
