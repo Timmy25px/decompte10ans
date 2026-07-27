@@ -6,67 +6,332 @@
 <title>Compteur</title>
 
 <style>
-/* Menu taille écran */
-
-#sizeMenu {
+#tools {
     position: fixed;
-    top: 20px;
-    left: 160px;
-
+    top: 10px;
+    left: 10px;
     z-index: 99999;
-
-    padding: 8px 12px;
-
-    font-family: Arial, sans-serif;
-    font-size: 15px;
-
-    background: white;
-    color: black;
-
-    border-radius: 6px;
-    border: 1px solid #777;
-
-    cursor: pointer;
+    background: rgba(0,0,0,.7);
+    padding: 10px;
+    border-radius: 10px;
+    font-family: Arial;
+    color:white;
 }
 
 
-/* bouton verrouillage */
+#tools button,
+#tools select {
 
-#lock {
-    position: fixed;
+    margin:3px;
+    padding:8px;
 
-    top: 20px;
-    left: 20px;
+    cursor:pointer;
 
-    z-index: 99999;
+}
 
-    padding: 8px 15px;
+<div id="iframe-container">
 
-    border-radius: 6px;
+    <iframe 
+        src="https://timmy25px.github.io/iframe-canva-2/"
+        allowfullscreen="allowfullscreen"
+        allow="fullscreen">
+    </iframe>
 
-    cursor: pointer;
+    <div id="top-left" class="handle"></div>
+    <div id="top-right" class="handle"></div>
+    <div id="bottom-left" class="handle"></div>
+    <div id="bottom-right" class="handle"></div>
+
+</div>
+
+#iframe-container iframe {
+
+    width:100%;
+    height:100%;
+
+    border:0;
+
+    pointer-events:none;
 
 }
 
 
-/* caché quand verrouillé */
+/* poignées */
+.handle {
 
-.locked-mode #sizeMenu {
+    position:absolute;
+
+    width:14px;
+    height:14px;
+
+    background:white;
+
     display:none;
+
 }
-    
-#lockScreen {
-    position: fixed;
-    inset: 0;
-    background: black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 99999;
-    flex-direction: column;
-    color: white;
-    font-family: Arial, sans-serif;
+
+
+#top-left {
+    left:-7px;
+    top:-7px;
+    cursor:nwse-resize;
 }
+
+#top-right {
+    right:-7px;
+    top:-7px;
+    cursor:nesw-resize;
+}
+
+#bottom-left {
+    left:-7px;
+    bottom:-7px;
+    cursor:nesw-resize;
+}
+
+#bottom-right {
+    right:-7px;
+    bottom:-7px;
+    cursor:nwse-resize;
+}
+
+
+</style>
+
+
+
+<div id="tools">
+
+<button id="lock">
+🔓 Déverrouiller
+</button>
+
+
+<select id="ratio">
+
+<option value="screen">
+Adapter écran
+</option>
+
+<option value="4:3">
+4:3
+</option>
+
+<option value="16:9">
+16:9
+</option>
+
+<option value="1:1">
+Carré
+</option>
+
+</select>
+
+
+</div>
+
+
+<script>
+
+const box = document.getElementById("iframe-container");
+const lockBtn = document.getElementById("lock");
+const ratio = document.getElementById("ratio");
+
+
+let locked = true;
+
+let dragging=false;
+
+let startX,startY,startLeft,startTop;
+
+
+
+function setLock(){
+
+    if(locked){
+
+        locked=false;
+
+        lockBtn.innerHTML="🔒 Verrouiller";
+
+        box.style.border="2px dashed red";
+
+        document.querySelectorAll(".handle")
+        .forEach(h=>h.style.display="block");
+
+        box.style.cursor="move";
+
+    }
+
+    else{
+
+        locked=true;
+
+        lockBtn.innerHTML="🔓 Déverrouiller";
+
+        box.style.border="0";
+
+        document.querySelectorAll(".handle")
+        .forEach(h=>h.style.display="none");
+
+    }
+
+}
+
+
+lockBtn.onclick=setLock;
+
+
+
+/* déplacement */
+
+box.onmousedown=e=>{
+
+if(locked)return;
+
+
+dragging=true;
+
+startX=e.clientX;
+startY=e.clientY;
+
+startLeft=box.offsetLeft;
+startTop=box.offsetTop;
+
+
+};
+
+
+document.onmousemove=e=>{
+
+
+if(!dragging)return;
+
+
+box.style.left=
+startLeft+(e.clientX-startX)+"px";
+
+
+box.style.top=
+startTop+(e.clientY-startY)+"px";
+
+
+};
+
+
+document.onmouseup=()=>{
+
+dragging=false;
+
+};
+
+
+
+
+/* formats */
+
+ratio.onchange=()=>{
+
+
+let w=window.innerWidth;
+let h=window.innerHeight;
+
+
+if(ratio.value=="screen"){
+
+box.style.width=w+"px";
+box.style.height=h+"px";
+
+}
+
+
+if(ratio.value=="16:9"){
+
+box.style.width="1920px";
+box.style.height="1080px";
+
+}
+
+
+if(ratio.value=="4:3"){
+
+box.style.width="1440px";
+box.style.height="1080px";
+
+}
+
+
+if(ratio.value=="1:1"){
+
+box.style.width="1080px";
+box.style.height="1080px";
+
+}
+
+
+};
+
+
+
+/* redimension coins */
+
+let resizing=false;
+let corner;
+
+
+document.querySelectorAll(".handle")
+.forEach(h=>{
+
+
+h.onmousedown=e=>{
+
+if(locked)return;
+
+resizing=true;
+
+corner=h.id;
+
+startX=e.clientX;
+startY=e.clientY;
+
+e.stopPropagation();
+
+};
+
+
+});
+
+
+document.onmousemove=e=>{
+
+
+if(!resizing)return;
+
+
+let dx=e.clientX-startX;
+let dy=e.clientY-startY;
+
+
+if(corner=="bottom-right"){
+
+box.style.width=
+box.offsetWidth+dx+"px";
+
+box.style.height=
+box.offsetHeight+dy+"px";
+
+}
+
+
+};
+
+
+
+document.onmouseup=()=>{
+
+resizing=false;
+
+};
 
 #lockScreen input {
     padding: 10px;
@@ -133,102 +398,12 @@
 
 <!-- DESIGN CANVA INCHANGÉ -->
 
-<button id="lock">
-🔒 Verrouiller
-</button>
-
-
-<select id="sizeMenu">
-
-<option value="1920x1080">
-Adapter à l'écran (16:9)
-</option>
-
-<option value="1280x720">
-1280x720 HD
-</option>
-
-<option value="1024x576">
-1024x576
-</option>
-
-<option value="800x450">
-800x450
-</option>
-
-<option value="1440x1080">
-4:3 HD
-</option>
-
-<option value="1024x768">
-4:3 classique
-</option>
-
-<option value="640x480">
-4:3 ancien
-</option>
-
-</select>
-
-
-<div id="canvasEditor">
-
-<iframe id="canvaFrame"
-src="https://timmy25px.github.io/iframe-canva-2/">
-</iframe>
-
+<div id="iframe-container">
+    <iframe 
+        src="https://timmy25px.github.io/iframe-canva-2/"
+        allowfullscreen>
+    </iframe>
 </div>
-
-
-
-<script>
-
-const menu = document.getElementById("sizeMenu");
-const editor = document.getElementById("canvasEditor");
-const lockButton = document.getElementById("lock");
-
-
-let locked = false;
-
-
-
-menu.onchange = function(){
-
-    if(locked) return;
-
-
-    let size=this.value.split("x");
-
-
-    editor.style.width=size[0]+"px";
-    editor.style.height=size[1]+"px";
-
-};
-
-
-
-lockButton.onclick=function(){
-
-
-    locked=!locked;
-
-
-    if(locked){
-
-        document.body.classList.add("locked-mode");
-
-        this.innerHTML="🔓 Déverrouiller";
-
-    }
-
-    else{
-
-        document.body.classList.remove("locked-mode");
-
-        this.innerHTML="🔒 Verrouiller";
-
-    }
-
 
 };
 
