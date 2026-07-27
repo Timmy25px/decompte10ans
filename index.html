@@ -7,31 +7,36 @@
 
 <style>
 html,body{
+
 margin:0;
+padding:0;
+
+width:100%;
+height:100%;
+
 overflow:hidden;
+
 background:black;
+
 }
 
 
-#transformBox{
+
+#canvasEditor{
 
 position:absolute;
 
-left:0;
-top:0;
+left:0px;
+top:0px;
 
 width:1920px;
 height:1080px;
 
-border:2px dashed white;
-
-resize:both;
-overflow:hidden;
-
 }
 
 
-#transformBox iframe{
+
+#canvaFrame{
 
 width:100%;
 height:100%;
@@ -39,68 +44,6 @@ height:100%;
 border:0;
 
 pointer-events:none;
-
-}
-
-
-/* poignées de rognage */
-
-#cropLeft,
-#cropRight,
-#cropTop,
-#cropBottom{
-
-position:absolute;
-
-z-index:10;
-
-background:transparent;
-
-}
-
-
-#cropLeft{
-left:-5px;
-top:0;
-width:10px;
-height:100%;
-cursor:w-resize;
-}
-
-
-#cropRight{
-right:-5px;
-top:0;
-width:10px;
-height:100%;
-cursor:e-resize;
-}
-
-
-#cropTop{
-top:-5px;
-left:0;
-height:10px;
-width:100%;
-cursor:n-resize;
-}
-
-
-#cropBottom{
-bottom:-5px;
-left:0;
-height:10px;
-width:100%;
-cursor:s-resize;
-}
-
-
-
-.locked{
-
-border:none!important;
-
-resize:none!important;
 
 }
     
@@ -182,115 +125,98 @@ resize:none!important;
 
 <!-- DESIGN CANVA INCHANGÉ -->
 
-<button id="lockBtn">🔓 Déverrouiller</button>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/moveable/dist/moveable.min.css">
 
-<div id="transformBox">
-    <div id="cropLeft"></div>
-    <div id="cropRight"></div>
-    <div id="cropTop"></div>
-    <div id="cropBottom"></div>
+<div id="canvasEditor">
 
-    <iframe 
+    <iframe id="canvaFrame"
     src="https://www.canva.com/design/DAHQHalUtOM/VW_lvRTYlOogieRFHmu3SA/view?embed">
     </iframe>
+
 </div>
 
+<button id="lock">
+🔒 Verrouiller
+</button>
+
+
+<script src="https://cdn.jsdelivr.net/npm/moveable/dist/moveable.min.js"></script>
 
 <script>
 
-let locked = true;
-
-const box = document.getElementById("transformBox");
-const btn = document.getElementById("lockBtn");
+let verrouille = false;
 
 
-btn.onclick = () => {
+const target = document.querySelector("#canvasEditor");
 
-    locked = !locked;
 
-    if(locked){
-        box.classList.add("locked");
-        btn.innerHTML="🔒 Verrouillé";
+const moveable = new Moveable(document.body,{
+    target: target,
+
+    draggable:true,
+    resizable:true,
+
+    keepRatio:false,
+
+    edge:true,
+
+    origin:false
+});
+
+
+
+moveable.on("drag", e=>{
+
+    if(verrouille) return;
+
+    e.target.style.transform=e.transform;
+
+});
+
+
+
+moveable.on("resize", e=>{
+
+    if(verrouille) return;
+
+
+    e.target.style.width=e.width+"px";
+    e.target.style.height=e.height+"px";
+
+
+    e.target.style.transform=e.drag.transform;
+
+});
+
+
+
+
+
+document.getElementById("lock").onclick=function(){
+
+    verrouille=!verrouille;
+
+
+    if(verrouille){
+
+        moveable.target=null;
+
+        this.innerHTML="🔓 Déverrouiller";
+
     }
+
     else{
-        box.classList.remove("locked");
-        btn.innerHTML="🔓 Déverrouillé";
-    }
 
-};
+        moveable.target=target;
 
-
-
-let move=false;
-let startX,startY;
-let startLeft,startTop;
-
-
-box.onmousedown=e=>{
-
-if(locked)return;
-
-move=true;
-
-startX=e.clientX;
-startY=e.clientY;
-
-startLeft=box.offsetLeft;
-startTop=box.offsetTop;
-
-};
-
-
-document.onmousemove=e=>{
-
-if(!move)return;
-
-box.style.left=
-(startLeft+e.clientX-startX)+"px";
-
-box.style.top=
-(startTop+e.clientY-startY)+"px";
-
-};
-
-
-document.onmouseup=()=>{
-
-move=false;
-
-};
-
-</script>
-
-
-<script>
-let locked = false;
-
-const frame = document.getElementById("editorFrame");
-const btn = document.getElementById("lockBtn");
-
-
-btn.onclick = () => {
-
-    locked = !locked;
-
-    if(locked){
-
-        frame.style.pointerEvents = "none";
-        btn.innerHTML = "🔒 Verrouillé";
-
-    } else {
-
-        frame.style.pointerEvents = "auto";
-        btn.innerHTML = "🔓 Déverrouiller";
+        this.innerHTML="🔒 Verrouiller";
 
     }
 
 };
+
+
 </script>
-
-<div class="canva-frame">
-
 
 
 <audio id="mainMusic" loop>
