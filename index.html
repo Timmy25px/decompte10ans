@@ -6,50 +6,513 @@
 <title>Compteur</title>
 
 <style>
-#editorFrame {
+<style>
 
-    position: absolute;
+#toolbar {
 
-    left: 0px;
-    top: 0px;
+position:fixed;
+top:10px;
+right:10px;
+z-index:99999;
 
-    width: 1920px;
-    height: 1080px;
+background:#111;
+color:white;
 
-    resize: both;
-    overflow: hidden;
+padding:10px;
+border-radius:10px;
 
-    border: 2px dashed white;
-
-}
-
-
-#editorFrame iframe {
-
-    width:100%;
-    height:100%;
-
-    border:0;
+font-family:Arial;
 
 }
 
 
-#lockBtn {
+#toolbar button,
+#toolbar select {
 
-    position: fixed;
+padding:7px;
+margin:3px;
 
-    top:20px;
-    right:20px;
-
-    z-index:99999;
-
-    padding:10px 20px;
-
-    font-size:18px;
-
-    cursor:pointer;
+cursor:pointer;
 
 }
+
+
+
+#sourceIframe {
+
+position:absolute;
+
+left:100px;
+top:100px;
+
+width:1920px;
+height:1080px;
+
+overflow:hidden;
+
+background:black;
+
+border:2px dashed transparent;
+
+box-sizing:border-box;
+
+}
+
+
+#sourceIframe.edit {
+
+border-color:white;
+
+}
+
+
+
+#sourceIframe iframe {
+
+width:100%;
+height:100%;
+
+border:0;
+
+pointer-events:none;
+
+}
+
+
+
+/* poignées */
+
+.handle {
+
+position:absolute;
+
+width:14px;
+height:14px;
+
+background:white;
+
+border:2px solid black;
+
+display:none;
+
+z-index:999;
+
+}
+
+
+
+.edit .handle {
+
+display:block;
+
+}
+
+
+
+.tl {left:-8px;top:-8px;cursor:nwse-resize;}
+.tr {right:-8px;top:-8px;cursor:nesw-resize;}
+.bl {left:-8px;bottom:-8px;cursor:nesw-resize;}
+.br {right:-8px;bottom:-8px;cursor:nwse-resize;}
+
+.ml {left:-8px;top:50%;cursor:ew-resize;}
+.mr {right:-8px;top:50%;cursor:ew-resize;}
+
+.mt {top:-8px;left:50%;cursor:ns-resize;}
+.mb {bottom:-8px;left:50%;cursor:ns-resize;}
+
+
+
+</style>
+
+
+
+
+
+<div id="toolbar">
+
+<button id="lock">
+🔓 Déverrouiller
+</button>
+
+
+<select id="ratio">
+
+<option value="screen">
+Adapter écran
+</option>
+
+<option value="16:9">
+16:9
+</option>
+
+<option value="4:3">
+4:3
+</option>
+
+<option value="16:10">
+16:10
+</option>
+
+<option value="21:9">
+21:9
+</option>
+
+<option value="1:1">
+1:1
+</option>
+
+</select>
+
+
+<button id="reset">
+↩ Reset
+</button>
+
+
+</div>
+
+
+
+
+
+<script>
+
+
+const box=document.getElementById("sourceIframe");
+
+const lock=document.getElementById("lock");
+
+const ratio=document.getElementById("ratio");
+
+const reset=document.getElementById("reset");
+
+
+
+let unlocked=true;
+
+
+
+// ajout poignées
+
+[
+"tl","tr","bl","br",
+"ml","mr","mt","mb"
+
+].forEach(c=>{
+
+let h=document.createElement("div");
+
+h.className="handle "+c;
+
+box.appendChild(h);
+
+
+});
+
+
+
+box.classList.add("edit");
+
+
+
+
+
+// verrouillage
+
+
+lock.onclick=()=>{
+
+
+unlocked=!unlocked;
+
+
+if(unlocked){
+
+box.classList.add("edit");
+
+lock.textContent="🔓 Déverrouiller";
+
+}
+
+else{
+
+box.classList.remove("edit");
+
+lock.textContent="🔒 Verrouillé";
+
+}
+
+
+};
+
+
+
+
+
+
+
+// déplacement
+
+
+let moving=false;
+
+let startX,startY,startL,startT;
+
+
+
+box.onmousedown=e=>{
+
+
+if(!unlocked)return;
+
+if(e.target.classList.contains("handle"))return;
+
+
+
+moving=true;
+
+
+startX=e.clientX;
+startY=e.clientY;
+
+startL=box.offsetLeft;
+startT=box.offsetTop;
+
+
+};
+
+
+
+document.onmousemove=e=>{
+
+
+if(moving){
+
+
+box.style.left=
+startL+(e.clientX-startX)+"px";
+
+
+box.style.top=
+startT+(e.clientY-startY)+"px";
+
+
+}
+
+
+};
+
+
+
+document.onmouseup=()=>{
+
+moving=false;
+
+};
+
+
+
+
+
+
+
+
+// resize + crop
+
+
+let resizing=false;
+
+let handle="";
+
+let sx,sy;
+
+let sw,sh;
+
+let sl,st;
+
+
+
+document.querySelectorAll(".handle")
+.forEach(h=>{
+
+
+h.onmousedown=e=>{
+
+
+if(!unlocked)return;
+
+
+resizing=true;
+
+handle=h.classList[1];
+
+
+sx=e.clientX;
+sy=e.clientY;
+
+
+sw=box.offsetWidth;
+sh=box.offsetHeight;
+
+
+sl=box.offsetLeft;
+st=box.offsetTop;
+
+
+e.stopPropagation();
+
+};
+
+
+});
+
+
+
+
+
+document.onmousemove=e=>{
+
+
+if(!resizing)return;
+
+
+let dx=e.clientX-sx;
+
+let dy=e.clientY-sy;
+
+
+
+if(handle.includes("r"))
+box.style.width=sw+dx+"px";
+
+
+if(handle.includes("b"))
+box.style.height=sh+dy+"px";
+
+
+
+if(handle.includes("l")){
+
+box.style.width=sw-dx+"px";
+box.style.left=sl+dx+"px";
+
+}
+
+
+
+if(handle.includes("t")){
+
+box.style.height=sh-dy+"px";
+box.style.top=st+dy+"px";
+
+}
+
+
+
+};
+
+
+
+document.onmouseup=()=>{
+
+resizing=false;
+
+};
+
+
+
+
+
+
+
+
+// formats
+
+
+ratio.onchange=()=>{
+
+
+switch(ratio.value){
+
+
+case "screen":
+
+box.style.left="0px";
+box.style.top="0px";
+
+box.style.width="100vw";
+box.style.height="100vh";
+
+break;
+
+
+
+case "16:9":
+
+box.style.width="1920px";
+box.style.height="1080px";
+
+break;
+
+
+
+case "4:3":
+
+box.style.width="1440px";
+box.style.height="1080px";
+
+break;
+
+
+
+case "16:10":
+
+box.style.width="1920px";
+box.style.height="1200px";
+
+break;
+
+
+
+case "21:9":
+
+box.style.width="2560px";
+box.style.height="1080px";
+
+break;
+
+
+
+case "1:1":
+
+box.style.width="1080px";
+box.style.height="1080px";
+
+break;
+
+
+}
+
+
+};
+
+
+
+
+
+
+
+reset.onclick=()=>{
+
+
+box.style.left="100px";
+box.style.top="100px";
+
+box.style.width="1920px";
+box.style.height="1080px";
+
+
+};
 
 #lockScreen input {
     padding: 10px;
