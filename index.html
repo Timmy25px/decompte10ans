@@ -242,96 +242,20 @@ body {
 </div>
 
 
-<script>
-const startDate = new Date(Date.UTC(2032, 7, 28, 13, 44, 0));
+<div class="overlay-counter">
 
-function differenceGreg() {
+<div class="counter">
 
-    const now = new Date();
+<div class="block"><div class="value" id="years">0</div><div class="label">ANNÉES</div></div>
+<div class="block"><div class="value" id="months">0</div><div class="label">MOIS</div></div>
+<div class="block"><div class="value" id="weeks">0</div><div class="label">SEMAINES</div></div>
+<div class="block"><div class="value" id="days">0</div><div class="label">JOURS</div></div>
+<div class="block"><div class="value" id="hours">0</div><div class="label">HEURES</div></div>
+<div class="block"><div class="value" id="minutes">0</div><div class="label">MINUTES</div></div>
+<div class="block"><div class="value" id="seconds">0</div><div class="label">SECONDES</div></div>
 
-    let start = startDate;
-    let end = now;
-
-    let negatif = false;
-
-    if (now < startDate) {
-        negatif = true;
-        start = now;
-        end = startDate;
-    }
-
-
-    let years = end.getUTCFullYear() - start.getUTCFullYear();
-    let months = end.getUTCMonth() - start.getUTCMonth();
-    let days = end.getUTCDate() - start.getUTCDate();
-    let hours = end.getUTCHours() - start.getUTCHours();
-    let minutes = end.getUTCMinutes() - start.getUTCMinutes();
-    let seconds = end.getUTCSeconds() - start.getUTCSeconds();
-    let tenths = Math.floor(end.getUTCMilliseconds() / 100);
-
-
-    if (tenths < 0) {
-        tenths += 10;
-        seconds--;
-    }
-
-    if (seconds < 0) {
-        seconds += 60;
-        minutes--;
-    }
-
-    if (minutes < 0) {
-        minutes += 60;
-        hours--;
-    }
-
-    if (hours < 0) {
-        hours += 24;
-        days--;
-    }
-
-
-    if (days < 0) {
-
-        const previousMonth = new Date(
-            Date.UTC(
-                end.getUTCFullYear(),
-                end.getUTCMonth(),
-                0
-            )
-        );
-
-        days += previousMonth.getUTCDate();
-        months--;
-    }
-
-
-    if (months < 0) {
-        months += 12;
-        years--;
-    }
-
-
-    if (negatif) {
-        years = -years;
-    }
-
-
-    document.getElementById("years").textContent = Math.abs(years);
-    document.getElementById("months").textContent = months;
-    document.getElementById("weeks").textContent = Math.floor(days / 7);
-    document.getElementById("days").textContent = days % 7;
-    document.getElementById("hours").textContent = hours;
-    document.getElementById("minutes").textContent = minutes;
-    document.getElementById("seconds").textContent = seconds + "." + tenths;
-
-}
-
-
-differenceGreg();
-
-setInterval(differenceGreg,100);
-</script>
+</div>
+</div>
 </div>
 
 <a href="https://www.canva.com/design/DAHQHalUtOM/VW_lvRTYlOogieRFHmu3SA/view?utm_content=DAHQHalUtOM&utm_campaign=designshare&utm_medium=embeds&utm_source=link" target="_blank" rel="noopener"> _</a> par Tim Gaudinaud
