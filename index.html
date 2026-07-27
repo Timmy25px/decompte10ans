@@ -6,76 +6,128 @@
 <title>Compteur</title>
 
 <style>
+
+/* =========================
+   BARRE DE CONTROLE
+========================= */
+
 #toolbar {
 
-position:fixed;
-top:10px;
-right:10px;
+    position: fixed;
+    top: 20px;
+    right: 20px;
 
-background:#111;
-color:white;
+    z-index: 99999;
 
-padding:10px;
+    display:flex;
+    gap:10px;
 
-border-radius:8px;
+    padding:12px;
 
-z-index:99999;
+    background:rgba(0,0,0,0.55);
 
-font-family:Arial;
+    backdrop-filter:blur(10px);
+
+    border-radius:18px;
 
 }
 
 
+/* Boutons modernes */
 
 #toolbar button,
 #toolbar select {
 
-padding:6px;
-margin:3px;
+
+    font-family:Lato, Arial, sans-serif;
+
+    font-size:16px;
+    font-weight:700;
+
+    color:white;
+
+    padding:10px 18px;
+
+    border-radius:14px;
+
+    border:9px solid transparent;
+
+    background:
+    linear-gradient(90deg,#FF66C4,#FFDE59) padding-box,
+    linear-gradient(90deg,#8C52FF,#FF914D) border-box;
+
+
+    cursor:pointer;
+
+    transition:0.2s;
 
 }
 
+
+#toolbar button:hover,
+#toolbar select:hover {
+
+    transform:scale(1.05);
+
+}
+
+
+
+/* =========================
+   SOURCE IFRAME
+========================= */
 
 
 #sourceIframe {
 
-position:absolute;
 
-left:100px;
-top:100px;
-
-width:1920px;
-height:1080px;
+    position:absolute;
 
 
-overflow:hidden;
+    left:100px;
+    top:100px;
 
-border:2px dashed transparent;
+
+    width:1920px;
+    height:1080px;
+
+
+    overflow:hidden;
+
+
+    border:2px dashed transparent;
 
 
 }
-
 
 
 #sourceIframe.edit {
 
-border-color:white;
+    border-color:white;
 
 }
 
 
+
+/* iframe intact */
 
 #sourceIframe iframe {
 
 
-width:100%;
-height:100%;
+    width:100%;
+    height:100%;
 
-border:0;
 
-pointer-events:none;
+    border:none;
+
+
+    display:block;
+
 
 }
+
+
+
 
 
 
@@ -83,408 +135,71 @@ pointer-events:none;
 
 .handle {
 
-position:absolute;
 
-width:12px;
-height:12px;
+    position:absolute;
 
-background:white;
+    width:14px;
+    height:14px;
 
-border:1px solid black;
 
-display:none;
+    background:white;
 
-z-index:10;
+    border:2px solid black;
+
+    border-radius:50%;
+
+
+    display:none;
+
+
+    z-index:10;
+
 
 }
-
 
 
 .edit .handle {
 
-display:block;
+    display:block;
 
 }
 
 
-
-.tl {left:-6px;top:-6px;cursor:nwse-resize;}
-.tr {right:-6px;top:-6px;cursor:nesw-resize;}
-.bl {left:-6px;bottom:-6px;cursor:nesw-resize;}
-.br {right:-6px;bottom:-6px;cursor:nwse-resize;}
-
-
-
-</style>
-
-
-
-<div id="toolbar">
-
-<button id="lockBtn">
-🔓 Déverrouiller
-</button>
-
-
-<select id="ratio">
-
-<option value="screen">
-Adapter écran
-</option>
-
-<option value="16/9">
-16:9
-</option>
-
-<option value="4/3">
-4:3
-</option>
-
-<option value="16/10">
-16:10
-</option>
-
-<option value="21/9">
-21:9
-</option>
-
-<option value="1/1">
-1:1
-</option>
-
-</select>
-
-
-<button id="cropBtn">
-✂️ Crop
-</button>
-
-
-</div>
-
-
-
-
-
-<script>
-
-
-const box=document.getElementById("sourceIframe");
-
-const lockBtn=document.getElementById("lockBtn");
-
-const ratio=document.getElementById("ratio");
-
-const cropBtn=document.getElementById("cropBtn");
-
-
-let unlocked=true;
-
-let crop=false;
-
-
-
-// poignées
-
-["tl","tr","bl","br"].forEach(c=>{
-
-let h=document.createElement("div");
-
-h.className="handle "+c;
-
-box.appendChild(h);
-
-
-h.onmousedown=e=>{
-
-if(!unlocked)return;
-
-
-resize=true;
-
-corner=c;
-
-startX=e.clientX;
-
-startY=e.clientY;
-
-startW=box.offsetWidth;
-
-startH=box.offsetHeight;
-
-
-e.stopPropagation();
-
-};
-
-
-});
-
-
-
-
-
-// verrouillage
-
-
-lockBtn.onclick=()=>{
-
-
-unlocked=!unlocked;
-
-
-if(unlocked){
-
-box.classList.add("edit");
-
-lockBtn.innerHTML="🔓 Déverrouiller";
-
-}
-
-else{
-
-box.classList.remove("edit");
-
-lockBtn.innerHTML="🔒 Verrouillé";
+.tl {
+
+left:-7px;
+top:-7px;
+cursor:nwse-resize;
 
 }
 
 
-save();
+.tr {
 
-
-};
-
-
-
-
-
-// déplacement
-
-
-let drag=false;
-
-
-box.onmousedown=e=>{
-
-
-if(!unlocked)return;
-
-if(e.target.className.includes("handle"))return;
-
-
-drag=true;
-
-
-dx=e.clientX-box.offsetLeft;
-dy=e.clientY-box.offsetTop;
-
-
-};
-
-
-
-document.onmousemove=e=>{
-
-
-if(drag){
-
-
-box.style.left=e.clientX-dx+"px";
-box.style.top=e.clientY-dy+"px";
-
+right:-7px;
+top:-7px;
+cursor:nesw-resize;
 
 }
 
 
+.bl {
 
-if(resize){
-
-
-let dw=e.clientX-startX;
-let dh=e.clientY-startY;
-
-
-if(corner.includes("r"))
-box.style.width=startW+dw+"px";
-
-
-if(corner.includes("b"))
-box.style.height=startH+dh+"px";
-
-
-
-if(corner.includes("l")){
-
-box.style.width=startW-dw+"px";
-box.style.left=box.offsetLeft+dw+"px";
+left:-7px;
+bottom:-7px;
+cursor:nesw-resize;
 
 }
 
 
-if(corner.includes("t")){
+.br {
 
-box.style.height=startH-dh+"px";
-box.style.top=box.offsetTop+dh+"px";
-
-}
-
+right:-7px;
+bottom:-7px;
+cursor:nwse-resize;
 
 }
 
-
-};
-
-
-
-document.onmouseup=()=>{
-
-drag=false;
-resize=false;
-
-save();
-
-};
-
-
-
-
-
-// crop OBS-like
-
-
-cropBtn.onclick=()=>{
-
-crop=!crop;
-
-
-if(crop){
-
-box.style.clipPath="inset(10px 10px 10px 10px)";
-
-cropBtn.innerHTML="✂️ Crop ON";
-
-}
-
-else{
-
-box.style.clipPath="none";
-
-cropBtn.innerHTML="✂️ Crop OFF";
-
-}
-
-
-};
-
-
-
-
-
-// formats
-
-
-ratio.onchange=()=>{
-
-
-switch(ratio.value){
-
-
-case"screen":
-
-box.style.width=innerWidth+"px";
-box.style.height=innerHeight+"px";
-
-break;
-
-
-case"16/9":
-
-box.style.width="1920px";
-box.style.height="1080px";
-
-break;
-
-
-case"4/3":
-
-box.style.width="1440px";
-box.style.height="1080px";
-
-break;
-
-
-case"16/10":
-
-box.style.width="1920px";
-box.style.height="1200px";
-
-break;
-
-
-case"21/9":
-
-box.style.width="2560px";
-box.style.height="1080px";
-
-break;
-
-
-case"1/1":
-
-box.style.width="1080px";
-box.style.height="1080px";
-
-break;
-
-
-}
-
-
-save();
-
-};
-
-
-
-
-
-// sauvegarde
-
-
-function save(){
-
-localStorage.setItem("iframeTransform",
-JSON.stringify({
-
-left:box.style.left,
-top:box.style.top,
-width:box.style.width,
-height:box.style.height
-
-}));
-
-}
-
-
-
-let saved=JSON.parse(localStorage.getItem("iframeTransform"));
-
-
-if(saved){
-
-box.style.left=saved.left;
-box.style.top=saved.top;
-box.style.width=saved.width;
-box.style.height=saved.height;
-
-}
-
-
-
-box.classList.add("edit");
-
-let resize=false;
 
 #lockScreen input {
     padding: 10px;
@@ -551,12 +266,13 @@ let resize=false;
 
 <!-- DESIGN CANVA INCHANGÉ -->
 <div id="sourceIframe">
-    <iframe 
-        src="https://timmy25px.github.io/iframe-canva-2/"
-        allowfullscreen>
-    </iframe>
+
+<iframe 
+src="https://timmy25px.github.io/iframe-canva-2/"
+allowfullscreen>
+</iframe>
+
 </div>
-</script>
 
 <audio id="mainMusic" loop>
     <source src="https://res.cloudinary.com/zp5nbve7/video/upload/v1784754618/ezyZip_bxpow8.mp4">
@@ -747,7 +463,248 @@ timer();
 
 
 </script>
+<div id="toolbar">
+
+<button id="lockBtn">
+🔓 Déverrouiller
+</button>
 
 
+<select id="format">
+
+<option>
+Adapter écran
+</option>
+
+<option>
+16:9
+</option>
+
+<option>
+4:3
+</option>
+
+<option>
+16:10
+</option>
+
+<option>
+21:9
+</option>
+
+
+</select>
+
+
+<button id="cropBtn">
+✂️ Crop
+</button>
+
+
+</div>
+
+
+
+<script>
+
+
+const box=document.getElementById("sourceIframe");
+
+const lock=document.getElementById("lockBtn");
+
+const format=document.getElementById("format");
+
+const crop=document.getElementById("cropBtn");
+
+
+let unlocked=true;
+
+let moving=false;
+
+let resizing=false;
+
+let startX,startY,startW,startH,startL,startT;
+
+
+
+/* verrouillage */
+
+lock.onclick=()=>{
+
+unlocked=!unlocked;
+
+
+if(unlocked){
+
+box.classList.add("edit");
+
+lock.textContent="🔓 Déverrouiller";
+
+}
+
+else{
+
+box.classList.remove("edit");
+
+lock.textContent="🔒 Verrouillé";
+
+}
+
+
+};
+
+
+
+
+/* déplacement */
+
+box.onmousedown=e=>{
+
+
+if(!unlocked)return;
+
+
+if(e.target.classList.contains("handle"))
+return;
+
+
+moving=true;
+
+
+startX=e.clientX-box.offsetLeft;
+
+startY=e.clientY-box.offsetTop;
+
+
+};
+
+
+
+
+document.onmousemove=e=>{
+
+
+if(moving){
+
+box.style.left=
+(e.clientX-startX)+"px";
+
+
+box.style.top=
+(e.clientY-startY)+"px";
+
+}
+
+
+
+};
+
+
+
+
+document.onmouseup=()=>{
+
+moving=false;
+
+resizing=false;
+
+};
+
+
+
+
+/* formats */
+
+format.onchange=()=>{
+
+
+if(format.value=="Adapter écran"){
+
+box.style.left="0px";
+box.style.top="0px";
+
+box.style.width="100vw";
+box.style.height="100vh";
+
+
+}
+
+
+if(format.value=="16:9"){
+
+box.style.width="1920px";
+box.style.height="1080px";
+
+}
+
+
+if(format.value=="4:3"){
+
+box.style.width="1440px";
+box.style.height="1080px";
+
+}
+
+
+if(format.value=="16:10"){
+
+box.style.width="1920px";
+box.style.height="1200px";
+
+}
+
+
+if(format.value=="21:9"){
+
+box.style.width="2560px";
+box.style.height="1080px";
+
+}
+
+
+};
+
+
+
+
+
+/* crop simple */
+
+let cropOn=false;
+
+
+crop.onclick=()=>{
+
+
+cropOn=!cropOn;
+
+
+if(cropOn){
+
+box.style.clipPath="inset(50px 50px 50px 50px)";
+
+crop.textContent="✂️ Crop ON";
+
+}
+
+else{
+
+box.style.clipPath="none";
+
+crop.textContent="✂️ Crop";
+
+}
+
+
+};
+
+
+
+
+
+box.classList.add("edit");
+
+
+</script>
 </body>
 </html>
