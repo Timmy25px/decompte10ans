@@ -6,278 +6,50 @@
 <title>Compteur</title>
 
 <style>
-<style>
+#editorFrame {
 
-#controleIframe {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    z-index: 99999;
-    background: #111;
-    padding: 10px;
-    border-radius: 10px;
-    color:white;
-    font-family:Arial;
-}
+    position: absolute;
 
+    left: 0px;
+    top: 0px;
 
-#controleIframe button,
-#controleIframe select {
+    width: 1920px;
+    height: 1080px;
 
-    margin:3px;
-    padding:6px 10px;
-    cursor:pointer;
+    resize: both;
+    overflow: hidden;
+
+    border: 2px dashed white;
 
 }
 
 
-
-#iframeSource {
-
-    position:absolute;
-
-    left:100px;
-    top:100px;
-
-    width:1920px;
-    height:1080px;
-
-    overflow:hidden;
-
-    resize:both;
-
-    border:2px dashed transparent;
-
-}
-
-
-
-#iframeSource.edition {
-
-    border-color:white;
-
-    cursor:move;
-
-}
-
-
-
-#iframeSource iframe {
+#editorFrame iframe {
 
     width:100%;
     height:100%;
 
     border:0;
 
-    pointer-events:none;
-
 }
 
 
+#lockBtn {
 
-#iframeSource.edition iframe {
+    position: fixed;
 
-    pointer-events:none;
+    top:20px;
+    right:20px;
 
-}
+    z-index:99999;
 
+    padding:10px 20px;
 
+    font-size:18px;
 
-</style>
-
-
-
-<div id="controleIframe">
-
-<button id="lock">
-🔓 Déverrouiller
-</button>
-
-
-<select id="format">
-
-<option value="screen">
-Adapter écran
-</option>
-
-<option value="4/3">
-4:3
-</option>
-
-<option value="16/9">
-16:9
-</option>
-
-<option value="16/10">
-16:10
-</option>
-
-<option value="21/9">
-21:9
-</option>
-
-<option value="1/1">
-1:1
-</option>
-
-</select>
-
-</div>
-
-
-
-<script>
-
-const box = document.getElementById("iframeSource");
-const lock = document.getElementById("lock");
-const format = document.getElementById("format");
-
-
-let unlocked = true;
-
-
-
-// verrouillage
-
-lock.onclick = ()=>{
-
-unlocked=!unlocked;
-
-
-if(unlocked){
-
-box.classList.add("edition");
-lock.innerHTML="🔓 Déverrouiller";
+    cursor:pointer;
 
 }
-
-else{
-
-box.classList.remove("edition");
-lock.innerHTML="🔒 Verrouillé";
-
-}
-
-};
-
-
-
-
-
-// déplacement souris
-
-let move=false;
-let x,y;
-
-
-box.onmousedown=e=>{
-
-if(!unlocked)return;
-
-
-move=true;
-
-x=e.clientX-box.offsetLeft;
-y=e.clientY-box.offsetTop;
-
-
-};
-
-
-
-document.onmousemove=e=>{
-
-if(!move)return;
-
-
-box.style.left=(e.clientX-x)+"px";
-box.style.top=(e.clientY-y)+"px";
-
-
-};
-
-
-document.onmouseup=()=>{
-
-move=false;
-
-};
-
-
-
-
-
-
-
-// formats
-
-format.onchange=()=>{
-
-
-let w=window.innerWidth;
-let h=window.innerHeight;
-
-
-switch(format.value){
-
-
-case "screen":
-
-box.style.width=w+"px";
-box.style.height=h+"px";
-
-break;
-
-
-
-case "4/3":
-
-box.style.width="1440px";
-box.style.height="1080px";
-
-break;
-
-
-
-case "16/9":
-
-box.style.width="1920px";
-box.style.height="1080px";
-
-break;
-
-
-
-case "16/10":
-
-box.style.width="1920px";
-box.style.height="1200px";
-
-break;
-
-
-
-case "21/9":
-
-box.style.width="2560px";
-box.style.height="1080px";
-
-break;
-
-
-
-case "1/1":
-
-box.style.width="1080px";
-box.style.height="1080px";
-
-break;
-
-
-}
-
-
-};
 
 #lockScreen input {
     padding: 10px;
@@ -343,13 +115,41 @@ break;
 
 
 <!-- DESIGN CANVA INCHANGÉ -->
+<button id="lockBtn">🔓 Déverrouiller</button>
 
-<div id="iframeSource">
+<div id="editorFrame">
     <iframe 
-        src="https://timmy25px.github.io/iframe-canva-2/"
+        src="https://www.canva.com/design/DAHQHalUtOM/VW_lvRTYlOogieRFHmu3SA/view?embed"
         allowfullscreen>
     </iframe>
 </div>
+
+
+<script>
+let locked = false;
+
+const frame = document.getElementById("editorFrame");
+const btn = document.getElementById("lockBtn");
+
+
+btn.onclick = () => {
+
+    locked = !locked;
+
+    if(locked){
+
+        frame.style.pointerEvents = "none";
+        btn.innerHTML = "🔒 Verrouillé";
+
+    } else {
+
+        frame.style.pointerEvents = "auto";
+        btn.innerHTML = "🔓 Déverrouiller";
+
+    }
+
+};
+</script>
     
 </script>
 
