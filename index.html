@@ -166,6 +166,40 @@ body {
 
     <div id="error"></div>
 
+}
+
+    <div class="overlay-counter">
+
+<div class="counter">
+
+<div class="block">
+<div class="value" id="years">0</div>
+<div class="label">ANNÉES</div>
+</div>
+
+<div class="block">
+<div class="value" id="months">0</div>
+<div class="label">MOIS</div>
+</div>
+
+<div class="block">
+<div class="value" id="days">0</div>
+<div class="label">JOURS</div>
+</div>
+
+<div class="block">
+<div class="value" id="hours">0</div>
+<div class="label">HEURES</div>
+</div>
+
+<div class="block">
+<div class="value" id="minutes">0</div>
+<div class="label">MINUTES</div>
+</div>
+
+<div class="block">
+<div class="value" id="seconds">0.0</div>
+<div class="label">SECONDES</div>
 </div>
 
 
@@ -393,5 +427,101 @@ timer();
 </script>
 
 <style>
+<script>
+
+const debut = new Date(Date.UTC(2022, 7, 28, 13, 44, 0));
+
+
+function calculerTemps(){
+
+    const maintenant = new Date();
+
+    let annee = maintenant.getUTCFullYear() - debut.getUTCFullYear();
+
+    let anniversaire = new Date(Date.UTC(
+        debut.getUTCFullYear() + annee,
+        debut.getUTCMonth(),
+        debut.getUTCDate(),
+        debut.getUTCHours(),
+        debut.getUTCMinutes(),
+        debut.getUTCSeconds()
+    ));
+
+
+    if(anniversaire > maintenant){
+        annee--;
+        anniversaire = new Date(Date.UTC(
+            debut.getUTCFullYear() + annee,
+            debut.getUTCMonth(),
+            debut.getUTCDate(),
+            debut.getUTCHours(),
+            debut.getUTCMinutes(),
+            debut.getUTCSeconds()
+        ));
+    }
+
+
+    let reste = maintenant - anniversaire;
+
+
+    let mois = 0;
+    let dateTest = new Date(anniversaire);
+
+
+    while(true){
+
+        let prochainMois = new Date(Date.UTC(
+            dateTest.getUTCFullYear(),
+            dateTest.getUTCMonth()+1,
+            dateTest.getUTCDate(),
+            dateTest.getUTCHours(),
+            dateTest.getUTCMinutes(),
+            dateTest.getUTCSeconds()
+        ));
+
+
+        if(prochainMois <= maintenant){
+            mois++;
+            dateTest = prochainMois;
+        }
+        else{
+            break;
+        }
+    }
+
+
+    reste = maintenant - dateTest;
+
+
+    let jours = Math.floor(reste / 86400000);
+    reste -= jours * 86400000;
+
+
+    let heures = Math.floor(reste / 3600000);
+    reste -= heures * 3600000;
+
+
+    let minutes = Math.floor(reste / 60000);
+    reste -= minutes * 60000;
+
+
+    let secondes = reste / 1000;
+
+
+    document.getElementById("years").textContent = annee;
+    document.getElementById("months").textContent = mois;
+    document.getElementById("days").textContent = jours;
+    document.getElementById("hours").textContent = heures;
+    document.getElementById("minutes").textContent = minutes;
+    document.getElementById("seconds").textContent = secondes.toFixed(1);
+
+}
+
+
+calculerTemps();
+
+setInterval(calculerTemps,100);
+
+</script>
 </body>
 </html>
