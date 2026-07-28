@@ -25,6 +25,11 @@ html, body {
     align-items:center;
     gap:35px;
     color:white;
+
+    /* 🔒 largeur verrouillée (activée via JS) */
+    width:auto;
+    max-width:none;
+    min-width:0;
 }
 
 .element {
@@ -98,11 +103,10 @@ function miseAJour(){
     // Temps total écoulé en ms
     const total = maintenant - debut;
 
-    // --- CALCUL DES SECONDES SANS DÉCALAGE ---
-    // secondes réelles, basées sur le temps total
+    // --- SECONDES SYNCHRO ---
     const secondesReelles = ((total / 1000) % 60).toFixed(1);
 
-    // --- CALCUL DES ANNÉES ---
+    // --- ANNÉES ---
     let annees = maintenant.getUTCFullYear() - debut.getUTCFullYear();
 
     let anniversaire = new Date(Date.UTC(
@@ -123,7 +127,7 @@ function miseAJour(){
 
     let difference = maintenant - reste;
 
-    // --- CALCUL DES MOIS ---
+    // --- MOIS ---
     let mois = 0;
     let temp = new Date(reste);
 
@@ -163,7 +167,7 @@ function miseAJour(){
     let minutes = Math.floor(difference/minute);
     difference -= minutes*minute;
 
-    // --- SECONDES SYNCHRONISÉES ---
+    // --- SECONDES ---
     let secondes = secondesReelles.padStart(4,"0");
 
     // --- AFFICHAGE ---
@@ -178,6 +182,26 @@ function miseAJour(){
 
 miseAJour();
 setInterval(miseAJour,100);
+
+
+// 🔒 VERROU LARGEUR 920px ENTRE 124 ET 857px
+function verrouLargeur() {
+    const zone = document.body.clientWidth;
+    const compteur = document.getElementById("compteur");
+
+    if (zone >= 124 && zone <= 857) {
+        compteur.style.width = "920px";
+        compteur.style.maxWidth = "920px";
+        compteur.style.minWidth = "920px";
+    } else {
+        compteur.style.width = "auto";
+        compteur.style.maxWidth = "none";
+        compteur.style.minWidth = "0";
+    }
+}
+
+verrouLargeur();
+window.addEventListener("resize", verrouLargeur);
 
 </script>
 
