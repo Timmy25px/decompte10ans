@@ -1,138 +1,182 @@
 const wrapper = document.getElementById("obs-wrapper");
 
-let resizing = false;
-let direction = "";
+let drag = false;
+let resize = false;
 
-let startX;
-let startY;
+let resizeSide = "";
 
-let startWidth;
-let startHeight;
+let offsetX = 0;
+let offsetY = 0;
 
-let startLeft;
-let startTop;
+let startX = 0;
+let startY = 0;
 
+let startWidth = 0;
+let startHeight = 0;
 
-
-function startResize(e, dir){
-
-    resizing = true;
-    direction = dir;
-
-    startX = e.clientX;
-    startY = e.clientY;
-
-    startWidth = wrapper.offsetWidth;
-    startHeight = wrapper.offsetHeight;
-
-    startLeft = wrapper.offsetLeft;
-    startTop = wrapper.offsetTop;
-
-    e.preventDefault();
-
-}
+let startLeft = 0;
+let startTop = 0;
 
 
 
-document.addEventListener("mousemove", (e)=>{
+// Déplacement de la fenêtre
+
+wrapper.addEventListener("mousedown", (e)=>{
 
 
-    if(!resizing) return;
-
-
-    let dx = e.clientX - startX;
-    let dy = e.clientY - startY;
-
-
-
-    if(direction.includes("right")){
-
-        wrapper.style.width =
-        (startWidth + dx) + "px";
-
+    if(e.target.classList.contains("resize-handle")){
+        return;
     }
 
 
-
-    if(direction.includes("bottom")){
-
-        wrapper.style.height =
-        (startHeight + dy) + "px";
-
-    }
+    drag = true;
 
 
-
-    if(direction.includes("left")){
-
-        wrapper.style.width =
-        (startWidth - dx) + "px";
-
-        wrapper.style.left =
-        (startLeft + dx) + "px";
-
-    }
-
-
-
-    if(direction.includes("top")){
-
-        wrapper.style.height =
-        (startHeight - dy) + "px";
-
-        wrapper.style.top =
-        (startTop + dy) + "px";
-
-    }
+    offsetX = e.clientX - wrapper.offsetLeft;
+    offsetY = e.clientY - wrapper.offsetTop;
 
 
 });
 
 
 
-document.addEventListener("mouseup", ()=>{
-
-    resizing=false;
-
-    direction="";
-
-});
 
 
+// Redimensionnement par les côtés
 
-
-// Création des zones de redimensionnement
-
-const sides = [
-    "top",
-    "bottom",
-    "left",
-    "right",
-    "top-left",
-    "top-right",
-    "bottom-left",
-    "bottom-right"
-];
-
-
-
-sides.forEach(side=>{
-
-
-    let handle = document.createElement("div");
-
-    handle.className =
-    "resize-handle " + side;
+document.querySelectorAll(".resize-handle").forEach(handle=>{
 
 
     handle.addEventListener("mousedown",(e)=>{
 
-        startResize(e,side);
+
+        resize = true;
+
+
+        resizeSide = handle.dataset.side;
+
+
+        startX = e.clientX;
+        startY = e.clientY;
+
+
+        startWidth = wrapper.offsetWidth;
+        startHeight = wrapper.offsetHeight;
+
+
+        startLeft = wrapper.offsetLeft;
+        startTop = wrapper.offsetTop;
+
+
+        e.stopPropagation();
+
 
     });
 
 
-    wrapper.appendChild(handle);
+});
+
+
+
+
+
+document.addEventListener("mousemove",(e)=>{
+
+
+    // déplacement
+
+    if(drag){
+
+
+        wrapper.style.left =
+        (e.clientX - offsetX) + "px";
+
+
+        wrapper.style.top =
+        (e.clientY - offsetY) + "px";
+
+
+    }
+
+
+
+    // redimensionnement
+
+    if(resize){
+
+
+        let dx = e.clientX - startX;
+        let dy = e.clientY - startY;
+
+
+
+        if(resizeSide === "right"){
+
+            wrapper.style.width =
+            (startWidth + dx) + "px";
+
+        }
+
+
+
+        if(resizeSide === "left"){
+
+
+            wrapper.style.width =
+            (startWidth - dx) + "px";
+
+
+            wrapper.style.left =
+            (startLeft + dx) + "px";
+
+
+        }
+
+
+
+        if(resizeSide === "bottom"){
+
+
+            wrapper.style.height =
+            (startHeight + dy) + "px";
+
+
+        }
+
+
+
+        if(resizeSide === "top"){
+
+
+            wrapper.style.height =
+            (startHeight - dy) + "px";
+
+
+            wrapper.style.top =
+            (startTop + dy) + "px";
+
+
+        }
+
+
+
+    }
+
+
+});
+
+
+
+
+
+document.addEventListener("mouseup",()=>{
+
+
+    drag = false;
+
+    resize = false;
+
+    resizeSide = "";
 
 
 });
