@@ -18,75 +18,63 @@ let startLeft = 0;
 let startTop = 0;
 
 
-
-// Déplacement de la fenêtre
+// déplacement
 
 wrapper.addEventListener("mousedown", (e)=>{
 
-
-    if(e.target.classList.contains("resize-handle")){
-        return;
-    }
-
+    if(e.target.classList.contains("resize-handle")) return;
 
     drag = true;
 
-
-    offsetX = e.clientX - wrapper.offsetLeft;
-    offsetY = e.clientY - wrapper.offsetTop;
-
+    offsetX = e.clientX - wrapper.getBoundingClientRect().left;
+    offsetY = e.clientY - wrapper.getBoundingClientRect().top;
 
 });
 
 
 
-
-
-// Redimensionnement par les côtés
+// redimensionnement côtés
 
 document.querySelectorAll(".resize-handle").forEach(handle=>{
 
-
     handle.addEventListener("mousedown",(e)=>{
-
 
         resize = true;
 
-
         resizeSide = handle.dataset.side;
+
+
+        const rect = wrapper.getBoundingClientRect();
 
 
         startX = e.clientX;
         startY = e.clientY;
 
 
-        startWidth = wrapper.offsetWidth;
-        startHeight = wrapper.offsetHeight;
+        startWidth = rect.width;
+        startHeight = rect.height;
 
 
-        startLeft = wrapper.offsetLeft;
-        startTop = wrapper.offsetTop;
+        startLeft = rect.left;
+        startTop = rect.top;
 
 
+        e.preventDefault();
         e.stopPropagation();
 
-
     });
-
 
 });
 
 
 
 
+// mouvement souris
 
 document.addEventListener("mousemove",(e)=>{
 
 
-    // déplacement
-
     if(drag){
-
 
         wrapper.style.left =
         (e.clientX - offsetX) + "px";
@@ -95,12 +83,9 @@ document.addEventListener("mousemove",(e)=>{
         wrapper.style.top =
         (e.clientY - offsetY) + "px";
 
-
     }
 
 
-
-    // redimensionnement
 
     if(resize){
 
@@ -113,7 +98,16 @@ document.addEventListener("mousemove",(e)=>{
         if(resizeSide === "right"){
 
             wrapper.style.width =
-            (startWidth + dx) + "px";
+            Math.max(100,startWidth + dx) + "px";
+
+        }
+
+
+
+        if(resizeSide === "bottom"){
+
+            wrapper.style.height =
+            Math.max(100,startHeight + dy) + "px";
 
         }
 
@@ -122,24 +116,16 @@ document.addEventListener("mousemove",(e)=>{
         if(resizeSide === "left"){
 
 
+            let newWidth =
+            Math.max(100,startWidth - dx);
+
+
             wrapper.style.width =
-            (startWidth - dx) + "px";
+            newWidth + "px";
 
 
             wrapper.style.left =
             (startLeft + dx) + "px";
-
-
-        }
-
-
-
-        if(resizeSide === "bottom"){
-
-
-            wrapper.style.height =
-            (startHeight + dy) + "px";
-
 
         }
 
@@ -148,16 +134,18 @@ document.addEventListener("mousemove",(e)=>{
         if(resizeSide === "top"){
 
 
+            let newHeight =
+            Math.max(100,startHeight - dy);
+
+
             wrapper.style.height =
-            (startHeight - dy) + "px";
+            newHeight + "px";
 
 
             wrapper.style.top =
             (startTop + dy) + "px";
 
-
         }
-
 
 
     }
@@ -171,12 +159,10 @@ document.addEventListener("mousemove",(e)=>{
 
 document.addEventListener("mouseup",()=>{
 
-
     drag = false;
 
     resize = false;
 
     resizeSide = "";
-
 
 });
