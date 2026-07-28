@@ -12,15 +12,15 @@ html,body{
 
     position:absolute;
 
-    left:50%;
-    top:50%;
+    left:500px;
+    top:500px;
 
-    transform:translate(-50%,-50%);
-
-    width:1920px;
-    height:1080px;
+    width:640px;
+    height:360px;
 
     overflow:hidden;
+
+}
 
 }
 
