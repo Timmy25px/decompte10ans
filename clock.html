@@ -45,7 +45,6 @@ html, body {
 </style>
 
 </head>
-
 <body>
 
 <div id="compteur">
@@ -87,18 +86,23 @@ html, body {
 
 </div>
 
-
 <script>
 
+// Date de départ
 const debut = new Date(Date.UTC(2022,7,28,13,44,0));
-
 
 function miseAJour(){
 
     const maintenant = new Date();
 
-    let total = maintenant - debut;
+    // Temps total écoulé en ms
+    const total = maintenant - debut;
 
+    // --- CALCUL DES SECONDES SANS DÉCALAGE ---
+    // secondes réelles, basées sur le temps total
+    const secondesReelles = ((total / 1000) % 60).toFixed(1);
+
+    // --- CALCUL DES ANNÉES ---
     let annees = maintenant.getUTCFullYear() - debut.getUTCFullYear();
 
     let anniversaire = new Date(Date.UTC(
@@ -119,7 +123,7 @@ function miseAJour(){
 
     let difference = maintenant - reste;
 
-
+    // --- CALCUL DES MOIS ---
     let mois = 0;
     let temp = new Date(reste);
 
@@ -135,40 +139,42 @@ function miseAJour(){
         }
     }
 
-
     difference = maintenant - temp;
 
+    // Durées fixes
     const semaine = 604800000;
     const jour = 86400000;
     const heure = 3600000;
     const minute = 60000;
 
-
+    // Semaines
     let semaines = Math.floor(difference/semaine);
     difference -= semaines*semaine;
 
+    // Jours
     let jours = Math.floor(difference/jour);
     difference -= jours*jour;
 
+    // Heures
     let heures = Math.floor(difference/heure);
     difference -= heures*heure;
 
+    // Minutes
     let minutes = Math.floor(difference/minute);
     difference -= minutes*minute;
 
-    let secondes = (difference/1000).toFixed(1);
+    // --- SECONDES SYNCHRONISÉES ---
+    let secondes = secondesReelles.padStart(4,"0");
 
-
+    // --- AFFICHAGE ---
     document.getElementById("annees").textContent = annees;
     document.getElementById("mois").textContent = mois;
     document.getElementById("semaines").textContent = semaines;
     document.getElementById("jours").textContent = jours;
     document.getElementById("heures").textContent = String(heures).padStart(2,"0");
     document.getElementById("minutes").textContent = String(minutes).padStart(2,"0");
-    document.getElementById("secondes").textContent = secondes.padStart(4,"0");
-
+    document.getElementById("secondes").textContent = secondes;
 }
-
 
 miseAJour();
 setInterval(miseAJour,100);
