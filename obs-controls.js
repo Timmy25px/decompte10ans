@@ -1,25 +1,26 @@
 const wrapper = document.getElementById("obs-wrapper");
 
-let isDragging = false;
-let isResizing = false;
 
-let resizeDirection = null;
+let drag = false;
+let resize = false;
 
-let startMouseX = 0;
-let startMouseY = 0;
+let side = "";
 
-let startWidth = 0;
-let startHeight = 0;
+let startX;
+let startY;
 
-let startLeft = 0;
-let startTop = 0;
+let startWidth;
+let startHeight;
 
-let offsetX = 0;
-let offsetY = 0;
+let startLeft;
+let startTop;
+
+let offsetX;
+let offsetY;
 
 
 
-// déplacement
+// Déplacement souris
 
 wrapper.addEventListener("mousedown", (e)=>{
 
@@ -29,11 +30,15 @@ wrapper.addEventListener("mousedown", (e)=>{
     }
 
 
-    isDragging = true;
+    drag = true;
 
 
-    offsetX = e.clientX - wrapper.offsetLeft;
-    offsetY = e.clientY - wrapper.offsetTop;
+    offsetX =
+    e.clientX - wrapper.offsetLeft;
+
+
+    offsetY =
+    e.clientY - wrapper.offsetTop;
 
 
 });
@@ -41,22 +46,24 @@ wrapper.addEventListener("mousedown", (e)=>{
 
 
 
-// redimensionnement
 
-document.querySelectorAll(".resize-handle").forEach(handle=>{
+// Début redimensionnement
+
+document.querySelectorAll(".resize-handle")
+.forEach(handle=>{
 
 
     handle.addEventListener("mousedown",(e)=>{
 
 
-        isResizing = true;
+        resize = true;
 
 
-        resizeDirection = handle.dataset.direction;
+        side = handle.dataset.side;
 
 
-        startMouseX = e.clientX;
-        startMouseY = e.clientY;
+        startX = e.clientX;
+        startY = e.clientY;
 
 
         startWidth = wrapper.offsetWidth;
@@ -69,6 +76,7 @@ document.querySelectorAll(".resize-handle").forEach(handle=>{
 
         e.stopPropagation();
 
+
     });
 
 
@@ -77,12 +85,12 @@ document.querySelectorAll(".resize-handle").forEach(handle=>{
 
 
 
-// mouvement souris
+
 
 document.addEventListener("mousemove",(e)=>{
 
 
-    if(isDragging){
+    if(drag){
 
 
         wrapper.style.left =
@@ -97,53 +105,55 @@ document.addEventListener("mousemove",(e)=>{
 
 
 
-    if(isResizing){
 
 
-        let dx = e.clientX - startMouseX;
-        let dy = e.clientY - startMouseY;
+    if(resize){
+
+
+        let dx = e.clientX - startX;
+        let dy = e.clientY - startY;
 
 
 
-        if(resizeDirection==="right"){
+        if(side==="right"){
 
             wrapper.style.width =
-            Math.max(200,startWidth + dx)+"px";
+            startWidth + dx + "px";
 
         }
 
 
-        if(resizeDirection==="left"){
 
+        if(side==="left"){
 
             wrapper.style.width =
-            Math.max(200,startWidth - dx)+"px";
+            startWidth - dx + "px";
 
 
             wrapper.style.left =
-            (startLeft + dx)+"px";
+            startLeft + dx + "px";
 
         }
 
 
-        if(resizeDirection==="bottom"){
 
+        if(side==="bottom"){
 
             wrapper.style.height =
-            Math.max(100,startHeight + dy)+"px";
+            startHeight + dy + "px";
 
         }
 
 
-        if(resizeDirection==="top"){
 
+        if(side==="top"){
 
             wrapper.style.height =
-            Math.max(100,startHeight - dy)+"px";
+            startHeight - dy + "px";
 
 
             wrapper.style.top =
-            (startTop + dy)+"px";
+            startTop + dy + "px";
 
         }
 
@@ -156,14 +166,15 @@ document.addEventListener("mousemove",(e)=>{
 
 
 
-// arrêt
 
 document.addEventListener("mouseup",()=>{
 
-    isDragging=false;
 
-    isResizing=false;
+    drag=false;
 
-    resizeDirection=null;
+    resize=false;
+
+    side="";
+
 
 });
