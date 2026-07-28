@@ -1,15 +1,12 @@
 const wrapper = document.getElementById("obs-wrapper");
 
-let drag = false;
-let resize = false;
+let isDragging = false;
+let isResizing = false;
 
-let resizeSide = "";
+let resizeDirection = null;
 
-let offsetX = 0;
-let offsetY = 0;
-
-let startX = 0;
-let startY = 0;
+let startMouseX = 0;
+let startMouseY = 0;
 
 let startWidth = 0;
 let startHeight = 0;
@@ -17,52 +14,63 @@ let startHeight = 0;
 let startLeft = 0;
 let startTop = 0;
 
+let offsetX = 0;
+let offsetY = 0;
+
+
 
 // déplacement
 
 wrapper.addEventListener("mousedown", (e)=>{
 
-    if(e.target.classList.contains("resize-handle")) return;
 
-    drag = true;
+    if(e.target.classList.contains("resize-handle")){
+        return;
+    }
 
-    offsetX = e.clientX - wrapper.getBoundingClientRect().left;
-    offsetY = e.clientY - wrapper.getBoundingClientRect().top;
+
+    isDragging = true;
+
+
+    offsetX = e.clientX - wrapper.offsetLeft;
+    offsetY = e.clientY - wrapper.offsetTop;
+
 
 });
 
 
 
-// redimensionnement côtés
+
+// redimensionnement
 
 document.querySelectorAll(".resize-handle").forEach(handle=>{
 
+
     handle.addEventListener("mousedown",(e)=>{
 
-        resize = true;
 
-        resizeSide = handle.dataset.side;
-
-
-        const rect = wrapper.getBoundingClientRect();
+        isResizing = true;
 
 
-        startX = e.clientX;
-        startY = e.clientY;
+        resizeDirection = handle.dataset.direction;
 
 
-        startWidth = rect.width;
-        startHeight = rect.height;
+        startMouseX = e.clientX;
+        startMouseY = e.clientY;
 
 
-        startLeft = rect.left;
-        startTop = rect.top;
+        startWidth = wrapper.offsetWidth;
+        startHeight = wrapper.offsetHeight;
 
 
-        e.preventDefault();
+        startLeft = wrapper.offsetLeft;
+        startTop = wrapper.offsetTop;
+
+
         e.stopPropagation();
 
     });
+
 
 });
 
@@ -74,76 +82,68 @@ document.querySelectorAll(".resize-handle").forEach(handle=>{
 document.addEventListener("mousemove",(e)=>{
 
 
-    if(drag){
+    if(isDragging){
+
 
         wrapper.style.left =
-        (e.clientX - offsetX) + "px";
+        (e.clientX - offsetX)+"px";
 
 
         wrapper.style.top =
-        (e.clientY - offsetY) + "px";
+        (e.clientY - offsetY)+"px";
+
 
     }
 
 
 
-    if(resize){
+    if(isResizing){
 
 
-        let dx = e.clientX - startX;
-        let dy = e.clientY - startY;
+        let dx = e.clientX - startMouseX;
+        let dy = e.clientY - startMouseY;
 
 
 
-        if(resizeSide === "right"){
+        if(resizeDirection==="right"){
 
             wrapper.style.width =
-            Math.max(100,startWidth + dx) + "px";
+            Math.max(200,startWidth + dx)+"px";
 
         }
 
 
-
-        if(resizeSide === "bottom"){
-
-            wrapper.style.height =
-            Math.max(100,startHeight + dy) + "px";
-
-        }
-
-
-
-        if(resizeSide === "left"){
-
-
-            let newWidth =
-            Math.max(100,startWidth - dx);
+        if(resizeDirection==="left"){
 
 
             wrapper.style.width =
-            newWidth + "px";
+            Math.max(200,startWidth - dx)+"px";
 
 
             wrapper.style.left =
-            (startLeft + dx) + "px";
+            (startLeft + dx)+"px";
 
         }
 
 
-
-        if(resizeSide === "top"){
-
-
-            let newHeight =
-            Math.max(100,startHeight - dy);
+        if(resizeDirection==="bottom"){
 
 
             wrapper.style.height =
-            newHeight + "px";
+            Math.max(100,startHeight + dy)+"px";
+
+        }
+
+
+        if(resizeDirection==="top"){
+
+
+            wrapper.style.height =
+            Math.max(100,startHeight - dy)+"px";
 
 
             wrapper.style.top =
-            (startTop + dy) + "px";
+            (startTop + dy)+"px";
 
         }
 
@@ -156,13 +156,14 @@ document.addEventListener("mousemove",(e)=>{
 
 
 
+// arrêt
 
 document.addEventListener("mouseup",()=>{
 
-    drag = false;
+    isDragging=false;
 
-    resize = false;
+    isResizing=false;
 
-    resizeSide = "";
+    resizeDirection=null;
 
 });
