@@ -1,15 +1,12 @@
 const wrapper = document.getElementById("obs-wrapper");
 
-
 let drag = false;
 let resize = false;
 
 let resizeSide = null;
 
-
 let offsetX = 0;
 let offsetY = 0;
-
 
 let startX = 0;
 let startY = 0;
@@ -27,19 +24,18 @@ window.addEventListener("load",()=>{
 
     wrapper.style.left = "500px";
     wrapper.style.top = "500px";
-
     wrapper.style.transform = "none";
 
 });
 
 
 
-
-// Déplacement
+// Déplacement uniquement si on clique dans le contenu
 
 wrapper.addEventListener("mousedown",(e)=>{
 
 
+    // si on touche une bordure -> pas de déplacement
     if(e.target.classList.contains("resize-handle")){
         return;
     }
@@ -48,15 +44,11 @@ wrapper.addEventListener("mousedown",(e)=>{
     drag = true;
 
 
-    offsetX =
-    e.clientX - wrapper.offsetLeft;
+    offsetX = e.clientX - wrapper.offsetLeft;
+    offsetY = e.clientY - wrapper.offsetTop;
 
 
-    offsetY =
-    e.clientY - wrapper.offsetTop;
-
-
-    document.body.style.userSelect="none";
+    e.preventDefault();
 
 
 });
@@ -74,23 +66,22 @@ document.querySelectorAll(".resize-handle")
     handle.addEventListener("mousedown",(e)=>{
 
 
-        resize=true;
+        resize = true;
 
 
-        resizeSide =
-        handle.dataset.side;
+        resizeSide = handle.dataset.side;
 
 
-        startX=e.clientX;
-        startY=e.clientY;
+        startX = e.clientX;
+        startY = e.clientY;
 
 
-        startWidth=wrapper.offsetWidth;
-        startHeight=wrapper.offsetHeight;
+        startWidth = wrapper.offsetWidth;
+        startHeight = wrapper.offsetHeight;
 
 
-        startLeft=wrapper.offsetLeft;
-        startTop=wrapper.offsetTop;
+        startLeft = wrapper.offsetLeft;
+        startTop = wrapper.offsetTop;
 
 
         e.preventDefault();
@@ -106,7 +97,6 @@ document.querySelectorAll(".resize-handle")
 
 
 
-
 document.addEventListener("mousemove",(e)=>{
 
 
@@ -114,64 +104,71 @@ document.addEventListener("mousemove",(e)=>{
 
 
         wrapper.style.left =
-        (e.clientX-offsetX)+"px";
+        (e.clientX - offsetX) + "px";
 
 
         wrapper.style.top =
-        (e.clientY-offsetY)+"px";
+        (e.clientY - offsetY) + "px";
 
+
+        return;
 
     }
+
 
 
 
     if(resize){
 
 
-        let dx=e.clientX-startX;
-        let dy=e.clientY-startY;
+        let dx = e.clientX - startX;
+        let dy = e.clientY - startY;
 
 
 
-        if(resizeSide==="right"){
-
-            wrapper.style.width =
-            (startWidth+dx)+"px";
-
-        }
+        switch(resizeSide){
 
 
+            case "right":
 
-        if(resizeSide==="bottom"){
+                wrapper.style.width =
+                startWidth + dx + "px";
 
-            wrapper.style.height =
-            (startHeight+dy)+"px";
-
-        }
+                break;
 
 
 
-        if(resizeSide==="left"){
+            case "left":
 
-            wrapper.style.width =
-            (startWidth-dx)+"px";
+                wrapper.style.width =
+                startWidth - dx + "px";
 
+                wrapper.style.left =
+                startLeft + dx + "px";
 
-            wrapper.style.left =
-            (startLeft+dx)+"px";
-
-        }
-
+                break;
 
 
-        if(resizeSide==="top"){
 
-            wrapper.style.height =
-            (startHeight-dy)+"px";
+            case "bottom":
+
+                wrapper.style.height =
+                startHeight + dy + "px";
+
+                break;
 
 
-            wrapper.style.top =
-            (startTop+dy)+"px";
+
+            case "top":
+
+                wrapper.style.height =
+                startHeight - dy + "px";
+
+                wrapper.style.top =
+                startTop + dy + "px";
+
+                break;
+
 
         }
 
@@ -185,19 +182,14 @@ document.addEventListener("mousemove",(e)=>{
 
 
 
-// Arrêt complet interaction
-
 document.addEventListener("mouseup",()=>{
 
 
-    drag=false;
+    drag = false;
 
-    resize=false;
+    resize = false;
 
-    resizeSide=null;
-
-
-    document.body.style.userSelect="";
+    resizeSide = null;
 
 
 });
