@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Temps depuis le 28/08/2022</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap');
+
+html, body {
+    margin:0;
+    width:100%;
+    height:100%;
+    background:transparent;
+    overflow:hidden;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-family:'Lato', sans-serif;
+}
+
+#compteur {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:35px;
+    color:white;
+}
+
+.element {
+    text-align:center;
+}
+
+.nombre {
+    font-size:70px;
+    font-weight:700;
+    line-height:1;
+}
+
+.label {
+    margin-top:10px;
+    font-size:22px;
+    font-weight:300;
+}
+</style>
+
+</head>
+
+<body>
+
+<div id="compteur">
+
+<div class="element">
+<div class="nombre" id="annees">0</div>
+<div class="label">Années</div>
+</div>
+
+<div class="element">
+<div class="nombre" id="mois">0</div>
+<div class="label">Mois</div>
+</div>
+
+<div class="element">
+<div class="nombre" id="semaines">0</div>
+<div class="label">Semaines</div>
+</div>
+
+<div class="element">
+<div class="nombre" id="jours">0</div>
+<div class="label">Jours</div>
+</div>
+
+<div class="element">
+<div class="nombre" id="heures">00</div>
+<div class="label">Heures</div>
+</div>
+
+<div class="element">
+<div class="nombre" id="minutes">00</div>
+<div class="label">Minutes</div>
+</div>
+
+<div class="element">
+<div class="nombre" id="secondes">00.0</div>
+<div class="label">Secondes</div>
+</div>
+
+</div>
+
+
+<script>
+
+const debut = new Date(Date.UTC(2022,7,28,13,44,0));
+
+
+function miseAJour(){
+
+    const maintenant = new Date();
+
+    let total = maintenant - debut;
+
+    let annees = maintenant.getUTCFullYear() - debut.getUTCFullYear();
+
+    let anniversaire = new Date(Date.UTC(
+        maintenant.getUTCFullYear(),
+        7,
+        28,
+        13,
+        44,
+        0
+    ));
+
+    if(maintenant < anniversaire){
+        annees--;
+    }
+
+    let reste = new Date(debut);
+    reste.setUTCFullYear(reste.getUTCFullYear()+annees);
+
+    let difference = maintenant - reste;
+
+
+    let mois = 0;
+    let temp = new Date(reste);
+
+    while(true){
+        let prochain = new Date(temp);
+        prochain.setUTCMonth(prochain.getUTCMonth()+1);
+
+        if(prochain <= maintenant){
+            mois++;
+            temp = prochain;
+        } else {
+            break;
+        }
+    }
+
+
+    difference = maintenant - temp;
+
+    const semaine = 604800000;
+    const jour = 86400000;
+    const heure = 3600000;
+    const minute = 60000;
+
+
+    let semaines = Math.floor(difference/semaine);
+    difference -= semaines*semaine;
+
+    let jours = Math.floor(difference/jour);
+    difference -= jours*jour;
+
+    let heures = Math.floor(difference/heure);
+    difference -= heures*heure;
+
+    let minutes = Math.floor(difference/minute);
+    difference -= minutes*minute;
+
+    let secondes = (difference/1000).toFixed(1);
+
+
+    document.getElementById("annees").textContent = annees;
+    document.getElementById("mois").textContent = mois;
+    document.getElementById("semaines").textContent = semaines;
+    document.getElementById("jours").textContent = jours;
+    document.getElementById("heures").textContent = String(heures).padStart(2,"0");
+    document.getElementById("minutes").textContent = String(minutes).padStart(2,"0");
+    document.getElementById("secondes").textContent = secondes.padStart(4,"0");
+
+}
+
+
+miseAJour();
+setInterval(miseAJour,100);
+
+</script>
+
+</body>
+</html>
