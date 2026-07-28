@@ -1,12 +1,15 @@
 const wrapper = document.getElementById("obs-wrapper");
 
+
 let drag = false;
 let resize = false;
 
 let resizeSide = null;
 
+
 let offsetX = 0;
 let offsetY = 0;
+
 
 let startX = 0;
 let startY = 0;
@@ -19,36 +22,42 @@ let startTop = 0;
 
 
 
-// Position de départ
+// Position initiale
+
 window.addEventListener("load",()=>{
 
-    wrapper.style.left = "500px";
-    wrapper.style.top = "500px";
-    wrapper.style.transform = "none";
+    wrapper.style.left="500px";
+    wrapper.style.top="500px";
+
+    wrapper.style.transform="none";
 
 });
 
 
 
-// Déplacement uniquement si on clique dans le contenu
+
+// Déplacement uniquement hors poignées
 
 wrapper.addEventListener("mousedown",(e)=>{
 
 
-    // si on touche une bordure -> pas de déplacement
-    if(e.target.classList.contains("resize-handle")){
+    if(
+        e.target.classList.contains("resize-handle")
+    ){
         return;
     }
 
 
-    drag = true;
+
+    drag=true;
 
 
-    offsetX = e.clientX - wrapper.offsetLeft;
-    offsetY = e.clientY - wrapper.offsetTop;
+    offsetX =
+    e.clientX - wrapper.offsetLeft;
 
 
-    e.preventDefault();
+    offsetY =
+    e.clientY - wrapper.offsetTop;
 
 
 });
@@ -57,7 +66,7 @@ wrapper.addEventListener("mousedown",(e)=>{
 
 
 
-// Redimensionnement
+// Redimensionnement des côtés
 
 document.querySelectorAll(".resize-handle")
 .forEach(handle=>{
@@ -66,25 +75,37 @@ document.querySelectorAll(".resize-handle")
     handle.addEventListener("mousedown",(e)=>{
 
 
-        resize = true;
+        resize=true;
 
 
-        resizeSide = handle.dataset.side;
+        resizeSide =
+        handle.dataset.side;
 
 
-        startX = e.clientX;
-        startY = e.clientY;
+
+        startX=e.clientX;
+        startY=e.clientY;
 
 
-        startWidth = wrapper.offsetWidth;
-        startHeight = wrapper.offsetHeight;
+        startWidth=
+        wrapper.offsetWidth;
 
 
-        startLeft = wrapper.offsetLeft;
-        startTop = wrapper.offsetTop;
+        startHeight=
+        wrapper.offsetHeight;
+
+
+        startLeft=
+        wrapper.offsetLeft;
+
+
+        startTop=
+        wrapper.offsetTop;
+
 
 
         e.preventDefault();
+
         e.stopPropagation();
 
 
@@ -100,75 +121,73 @@ document.querySelectorAll(".resize-handle")
 document.addEventListener("mousemove",(e)=>{
 
 
+    // déplacement
+
     if(drag){
 
 
         wrapper.style.left =
-        (e.clientX - offsetX) + "px";
+        (e.clientX-offsetX)+"px";
 
 
         wrapper.style.top =
-        (e.clientY - offsetY) + "px";
+        (e.clientY-offsetY)+"px";
 
-
-        return;
 
     }
 
 
 
 
+    // redimensionnement
+
     if(resize){
 
 
-        let dx = e.clientX - startX;
-        let dy = e.clientY - startY;
+        const dx=e.clientX-startX;
+        const dy=e.clientY-startY;
 
 
 
-        switch(resizeSide){
+        if(resizeSide==="right"){
 
+            wrapper.style.width =
+            startWidth+dx+"px";
 
-            case "right":
-
-                wrapper.style.width =
-                startWidth + dx + "px";
-
-                break;
+        }
 
 
 
-            case "left":
+        if(resizeSide==="left"){
 
-                wrapper.style.width =
-                startWidth - dx + "px";
-
-                wrapper.style.left =
-                startLeft + dx + "px";
-
-                break;
+            wrapper.style.width =
+            startWidth-dx+"px";
 
 
+            wrapper.style.left =
+            startLeft+dx+"px";
 
-            case "bottom":
-
-                wrapper.style.height =
-                startHeight + dy + "px";
-
-                break;
+        }
 
 
 
-            case "top":
+        if(resizeSide==="bottom"){
 
-                wrapper.style.height =
-                startHeight - dy + "px";
+            wrapper.style.height =
+            startHeight+dy+"px";
 
-                wrapper.style.top =
-                startTop + dy + "px";
+        }
 
-                break;
 
+
+        if(resizeSide==="top"){
+
+            wrapper.style.height =
+            startHeight-dy+"px";
+
+
+            wrapper.style.top =
+            startTop+dy+"px";
 
         }
 
@@ -182,14 +201,15 @@ document.addEventListener("mousemove",(e)=>{
 
 
 
+
 document.addEventListener("mouseup",()=>{
 
 
-    drag = false;
+    drag=false;
 
-    resize = false;
+    resize=false;
 
-    resizeSide = null;
+    resizeSide=null;
 
 
 });
