@@ -6,402 +6,189 @@
 <title>Compteur</title>
 
 <style>
-html,body{
+
+html, body {
     margin:0;
     padding:0;
+    width:100%;
+    height:100%;
     overflow:hidden;
-    background:#111;
+    background:#000;
 }
 
 
-/* Zone type OBS */
-#source-container{
+/* Le compteur devient directement la page */
+
+#counter-container {
 
     position:absolute;
 
-    left:50%;
-    top:50%;
+    inset:0;
 
-    transform:translate(-50%,-50%);
-
-    width:1920px;
-    height:1080px;
+    width:100%;
+    height:100%;
 
     overflow:hidden;
 
 }
 
 
-/* iframe manipulable */
-#source-frame{
+/* Intégration simple du compteur */
 
-    position:absolute;
-
-    left:0;
-    top:0;
+#counter-frame {
 
     width:100%;
     height:100%;
 
     border:0;
 
-    transform-origin:center center;
+    display:block;
 
 }
 
 
-/* panneau */
-#controls{
+/* Bouton de secours navigateur */
+
+#playButton {
+
+    display:none;
 
     position:fixed;
 
-    bottom:20px;
-    left:20px;
+    bottom:15px;
+    right:15px;
 
-    z-index:9999;
+    z-index:99998;
 
-    display:flex;
-    gap:10px;
-
-    font-family:Arial;
-
-}
-
-
-
-/* boutons modernes */
-
-button,select{
-
-    padding:12px 20px;
-
-    border-radius:9px;
-
-    border:9px solid transparent;
-
-    background:
-    linear-gradient(90deg,#FF66C4,#FFDE59) padding-box,
-    linear-gradient(90deg,#8C52FF,#FF914D) border-box;
+    background:rgba(0,0,0,0.5);
 
     color:white;
 
-    font-weight:bold;
+    border:none;
+
+    padding:8px 14px;
+
+    border-radius:8px;
 
     cursor:pointer;
 
-    font-size:15px;
+    font-size:16px;
 
 }
 
 
-
-#locked{
-
-    user-select:none;
-
-}
-
-
-
-</style>
-
-
-
-<script>
-
-let locked=false;
-
-
-let scale=1;
-
-let posX=0;
-let posY=0;
-
-
-function updateTransform(){
-
-    let frame=document.getElementById("source-frame");
-
-
-    frame.style.transform=
-    `
-    translate(${posX}px,${posY}px)
-    scale(${scale})
-    `;
-
-}
-
-
-
-
-function unlock(){
-
-    locked=!locked;
-
-
-    document.getElementById("lockBtn").innerHTML=
-    locked ? "🔒 Verrouiller" : "🔓 Déverrouiller";
-
-
-}
-
-
-
-
-/* adapter écran */
-
-function fitScreen(){
-
-    let box=document.getElementById("source-container");
-
-    let frame=document.getElementById("source-frame");
-
-
-    let ratio=window.innerWidth/window.innerHeight;
-
-
-    if(ratio >= 16/9){
-
-        scale=window.innerHeight/1080;
-
-    }
-
-    else{
-
-        scale=window.innerWidth/1920;
-
-    }
-
-
-    posX=0;
-    posY=0;
-
-
-    updateTransform();
-
-}
-
-
-
-/* changement format */
-
-function changeRatio(){
-
-    let value=document.getElementById("ratio").value;
-
-
-    let frame=document.getElementById("source-frame");
-
-
-    if(value=="16:9"){
-
-        frame.style.aspectRatio="16/9";
-
-    }
-
-
-    if(value=="4:3"){
-
-        frame.style.aspectRatio="4/3";
-
-    }
-
-
-    if(value=="1:1"){
-
-        frame.style.aspectRatio="1/1";
-
-    }
-
-
-}
-
-
-
-
-
-/* déplacement type OBS */
-
-document.addEventListener("keydown",e=>{
-
-
-    if(locked)return;
-
-
-    if(e.key=="ArrowLeft")posX-=10;
-
-    if(e.key=="ArrowRight")posX+=10;
-
-    if(e.key=="ArrowUp")posY-=10;
-
-    if(e.key=="ArrowDown")posY+=10;
-
-
-    updateTransform();
-
-
-});
-
-
-
-window.onload=()=>{
-
-    fitScreen();
-
-#lockScreen input {
-    padding: 10px;
-    font-size: 18px;
-    margin-bottom: 10px;
-}
-
-#lockScreen button {
-    padding: 8px 20px;
-    cursor: pointer;
-}
-
-#error {
-    margin-top: 10px;
-    color: red;
-}
-
-#playButton {
-    display: none;
-    position: fixed;
-    bottom: 15px;
-    right: 15px;
-    z-index: 99998;
-    background: rgba(0,0,0,0.5);
-    color: white;
-    border: none;
-    padding: 8px 14px;
-    border-radius: 8px;
-    cursor: pointer;
-}
+/* écran blanc synchronisé */
 
 #whiteFade {
-    position: fixed;
-    inset: 0;
-    background: white;
-    opacity: 0;
-    pointer-events: none;
-    z-index: 99997;
-    transition: opacity 1s linear;
+
+    position:fixed;
+
+    inset:0;
+
+    background:white;
+
+    opacity:0;
+
+    pointer-events:none;
+
+    z-index:99997;
+
+    transition:opacity 1s linear;
+
 }
+
+
 </style>
 
 </head>
 
+
 <body>
 
 
-<div id="lockScreen">
+<!-- COMPTEUR DIRECTEMENT DANS LA PAGE -->
 
-    <input id="codeInput" type="password" placeholder="Code d'accès">
-
-    <button onclick="checkCode()">Valider</button>
-
-    <div id="error"></div>
-
-</div>
-
-
-<button id="playButton">▶ Play</button>
-
-
-<div id="whiteFade"></div>
-
-
-<!-- DESIGN CANVA INCHANGÉ -->
-<div id="source-container">
+<div id="counter-container">
 
 <iframe
-id="source-frame"
-src="https://timmy25px.github.io/iframe-canva-2/"
-allowfullscreen>
+
+id="counter-frame"
+
+src="canva-iframe.html">
+
 </iframe>
 
 </div>
 
+
+
+<!-- Bouton si autoplay bloqué -->
+
+<button id="playButton">
+▶ Play
+</button>
+
+
+
+<!-- écran blanc final -->
+
+<div id="whiteFade"></div>
+
+
+
+<!-- Musique principale -->
+
 <audio id="mainMusic" loop>
-    <source src="https://res.cloudinary.com/zp5nbve7/video/upload/v1784754618/ezyZip_bxpow8.mp4">
+
+<source src="https://res.cloudinary.com/zp5nbve7/video/upload/v1784754618/ezyZip_bxpow8.mp4">
+
 </audio>
 
 
+
+<!-- Deuxième son -->
+
 <audio id="secondSound">
-    <source src="https://res.cloudinary.com/zp5nbve7/video/upload/v1784992368/zero-time_music_gfbxon.m4a">
+
+<source src="https://res.cloudinary.com/zp5nbve7/video/upload/v1784992368/zero-time_music_gfbxon.m4a">
+
 </audio>
 
 
 
 <script>
 
-const validHash = "4af6ea0776625ccaf1d953afb986e306e66c192bffd566983d53970b6c67c76b";
+const mainMusic =
+document.getElementById("mainMusic");
 
 
-const mainMusic = document.getElementById("mainMusic");
-const secondSound = document.getElementById("secondSound");
-const playButton = document.getElementById("playButton");
+const secondSound =
+document.getElementById("secondSound");
 
 
-let unlocked = false;
-
-
-
-async function sha256(text){
-
-    const data = new TextEncoder().encode(text);
-
-    const hash = await crypto.subtle.digest(
-        "SHA-256",
-        data
-    );
-
-    return [...new Uint8Array(hash)]
-    .map(b => b.toString(16).padStart(2,"0"))
-    .join("");
-
-}
+const playButton =
+document.getElementById("playButton");
 
 
 
-async function checkCode(){
-
-    const input = document.getElementById("codeInput").value;
-
-    const hash = await sha256(input);
-
-
-    if(hash === validHash){
-
-        unlocked = true;
-
-        document.getElementById("lockScreen").style.display="none";
-
-        startMusic();
-
-    }
-
-    else{
-
-        document.getElementById("error").innerHTML =
-        "Code incorrect ❌";
-
-    }
-
-}
+let started = false;
 
 
 
 function startMusic(){
 
+
     mainMusic.volume = 1;
 
+
     mainMusic.play()
+
     .catch(()=>{
 
         playButton.style.display="block";
 
     });
+
 
 }
 
@@ -417,15 +204,9 @@ playButton.onclick=function(){
 
 
 
-
-// Synchronisation UTC
-
-function utcNow(){
-
-    return new Date();
-
-}
-
+/*
+Synchronisation UTC
+*/
 
 const fadeStart =
 Date.UTC(2032,7,28,13,42,50);
@@ -446,14 +227,116 @@ Date.UTC(2032,7,28,13,44,0);
 
 function timer(){
 
-    if(!unlocked){
-        requestAnimationFrame(timer);
-        return;
+    const now = Date.now();
+
+
+
+    // lancement automatique de la musique
+
+    if(!started){
+
+        started=true;
+
+        startMusic();
+
     }
 
 
-    const now = Date.now();
 
+    // fondu musique principale
+
+    if(now >= fadeStart && now <= fadeEnd){
+
+
+        let progress =
+        (now - fadeStart) /
+        (fadeEnd - fadeStart);
+
+
+
+        mainMusic.volume =
+        Math.max(0,1-progress);
+
+
+    }
+
+
+
+    // écran blanc
+
+    if(now >= whiteScreen){
+
+
+        document.getElementById("whiteFade")
+        .style.opacity="1";
+
+
+    }
+
+
+
+    // deuxième son
+
+    if(now >= secondStart && secondSound.paused){
+
+
+        mainMusic.pause();
+
+
+        secondSound.play();
+
+
+
+        setTimeout(()=>{
+
+
+            mainMusic.currentTime=0;
+
+            mainMusic.volume=1;
+
+
+            mainMusic.play();
+
+
+        },10000);
+
+
+
+    }
+
+
+
+    requestAnimationFrame(timer);
+
+}
+
+
+
+timer();
+
+
+</script>
+
+// Démarrage musique après première interaction si nécessaire
+
+document.addEventListener("click", () => {
+
+    if (!started) {
+
+        started = true;
+
+        startMusic();
+
+    }
+
+}, {once:true});
+
+
+// Synchronisation UTC
+
+function timer(){
+
+    const now = Date.now();
 
 
     // Fondu musique principale
@@ -466,38 +349,46 @@ function timer(){
 
 
         mainMusic.volume =
-        Math.max(0,1-progress);
+        Math.max(0, 1 - progress);
 
     }
 
 
-
-    // Écran blanc
+    // Écran blanc complet
 
     if(now >= whiteScreen){
 
-        document.getElementById("whiteFade").style.opacity="1";
+        document.getElementById("whiteFade")
+        .style.opacity="1";
 
     }
 
 
-
-    // Second son
+    // Deuxième son
 
     if(now >= secondStart && secondSound.paused){
 
+
         mainMusic.pause();
+
 
         secondSound.play();
 
+
+
         setTimeout(()=>{
 
+
             mainMusic.currentTime = 0;
+
             mainMusic.volume = 1;
+
 
             mainMusic.play();
 
+
         },10000);
+
 
     }
 
@@ -508,114 +399,3 @@ function timer(){
 
 
 timer();
-
-</script>
-<script>
-
-window.addEventListener("load",()=>{
-
-
-let iframe = document.querySelector("#sourceIframe iframe");
-
-
-if(!iframe){
-
-console.log("iframe introuvable");
-
-return;
-
-}
-
-
-
-let toolbar=document.createElement("div");
-
-toolbar.id="obsToolbar";
-
-
-toolbar.innerHTML=`
-
-<div id="controls">
-
-<button id="lockBtn" onclick="unlock()">
-🔓 Déverrouiller
-</button>
-
-
-<button onclick="fitScreen()">
-Adapter écran
-</button>
-
-
-<select id="ratio" onchange="changeRatio()">
-
-<option>16:9</option>
-<option>4:3</option>
-<option>1:1</option>
-
-</select>
-
-
-</div>
-`;
-
-document.body.appendChild(toolbar);
-
-
-
-let locked=false;
-
-
-
-document.getElementById("lock").onclick=function(){
-
-
-locked=!locked;
-
-
-this.textContent =
-locked ?
-"🔒 Verrouillé"
-:
-"🔓 Déverrouiller";
-
-
-};
-
-document.getElementById("formatSelect").addEventListener("change", function(){
-
-    const box = document.getElementById("sourceIframe");
-
-    let w = 0;
-    let h = 0;
-
-
-    if(this.value === "16:9"){
-        w = 1920;
-        h = 1080;
-    }
-
-
-    else if(this.value === "4:3"){
-        w = 1440;
-        h = 1080;
-    }
-
-
-    else if(this.value === "Adapter écran"){
-        w = window.innerWidth;
-        h = window.innerHeight;
-    }
-
-
-    box.style.width = w + "px";
-    box.style.height = h + "px";
-
-
-    // centrage de la source uniquement
-    box.style.left = ((window.innerWidth - w) / 2) + "px";
-    box.style.top = ((window.innerHeight - h) / 2) + "px";
-
-
-</body>
-</html>
