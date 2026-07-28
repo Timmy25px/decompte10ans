@@ -37,6 +37,117 @@ html, body {
 
 </head>
 <body>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connexion</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#000;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+#fakeLock{
+    width:380px;
+    background:#111;
+    border:2px solid #333;
+    border-radius:18px;
+    padding:35px;
+    text-align:center;
+    box-shadow:0 0 40px rgba(255,255,255,.08);
+}
+
+#fakeLock h2{
+    color:#fff;
+    font-size:30px;
+    margin-bottom:25px;
+}
+
+#fakeLock input{
+    width:100%;
+    height:50px;
+    border:none;
+    outline:none;
+    border-radius:12px;
+    padding:0 15px;
+    background:#1d1d1d;
+    color:#fff;
+    font-size:18px;
+    margin-bottom:18px;
+}
+
+#fakeLock input::placeholder{
+    color:#888;
+}
+
+#fakeLogin{
+    width:100%;
+    height:50px;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    font-size:18px;
+    font-weight:bold;
+    color:white;
+    background:linear-gradient(90deg,#8C52FF,#FF66C4,#FFDE59);
+    transition:.25s;
+}
+
+#fakeLogin:hover{
+    transform:scale(1.03);
+}
+
+#fakeError{
+    color:#ff5a5a;
+    margin-top:18px;
+    min-height:24px;
+    font-size:16px;
+}
+
+#protectedContent{
+    display:none;
+}
+</style>
+</head>
+
+<body>
+
+<div id="fakeLock">
+    <h2>Connexion</h2>
+
+    <input type="password" placeholder="Mot de passe">
+
+    <button id="fakeLogin">
+        Se connecter
+    </button>
+
+    <p id="fakeError"></p>
+</div>
+
+<div id="protectedContent">
+    <!-- Ton compteur HTML -->
+</div>
+
+<script src="security.js"></script>
+}
 
 <div id="canva">
     <iframe
