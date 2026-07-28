@@ -1,20 +1,107 @@
 const wrapper = document.getElementById("obs-wrapper");
 
-let resize = false;
-
-let startX = 0;
-let startY = 0;
-
-let startWidth = 0;
-let startHeight = 0;
-
-let startLeft = 0;
-let startTop = 0;
-
+let resizing = false;
 let direction = "";
 
+let startX;
+let startY;
 
-// création des zones de redimensionnement
+let startWidth;
+let startHeight;
+
+let startLeft;
+let startTop;
+
+
+
+function startResize(e, dir){
+
+    resizing = true;
+    direction = dir;
+
+    startX = e.clientX;
+    startY = e.clientY;
+
+    startWidth = wrapper.offsetWidth;
+    startHeight = wrapper.offsetHeight;
+
+    startLeft = wrapper.offsetLeft;
+    startTop = wrapper.offsetTop;
+
+    e.preventDefault();
+
+}
+
+
+
+document.addEventListener("mousemove", (e)=>{
+
+
+    if(!resizing) return;
+
+
+    let dx = e.clientX - startX;
+    let dy = e.clientY - startY;
+
+
+
+    if(direction.includes("right")){
+
+        wrapper.style.width =
+        (startWidth + dx) + "px";
+
+    }
+
+
+
+    if(direction.includes("bottom")){
+
+        wrapper.style.height =
+        (startHeight + dy) + "px";
+
+    }
+
+
+
+    if(direction.includes("left")){
+
+        wrapper.style.width =
+        (startWidth - dx) + "px";
+
+        wrapper.style.left =
+        (startLeft + dx) + "px";
+
+    }
+
+
+
+    if(direction.includes("top")){
+
+        wrapper.style.height =
+        (startHeight - dy) + "px";
+
+        wrapper.style.top =
+        (startTop + dy) + "px";
+
+    }
+
+
+});
+
+
+
+document.addEventListener("mouseup", ()=>{
+
+    resizing=false;
+
+    direction="";
+
+});
+
+
+
+
+// Création des zones de redimensionnement
 
 const sides = [
     "top",
@@ -28,132 +115,24 @@ const sides = [
 ];
 
 
-sides.forEach(side => {
 
-    const handle = document.createElement("div");
-
-    handle.className = "resize-" + side;
-
-    wrapper.appendChild(handle);
+sides.forEach(side=>{
 
 
-    handle.addEventListener("mousedown", e => {
+    let handle = document.createElement("div");
 
-        e.preventDefault();
-
-        resize = true;
-
-        direction = side;
+    handle.className =
+    "resize-handle " + side;
 
 
-        startX = e.clientX;
-        startY = e.clientY;
+    handle.addEventListener("mousedown",(e)=>{
 
-
-        startWidth = wrapper.offsetWidth;
-        startHeight = wrapper.offsetHeight;
-
-
-        startLeft = wrapper.offsetLeft;
-        startTop = wrapper.offsetTop;
+        startResize(e,side);
 
     });
 
-});
 
+    wrapper.appendChild(handle);
 
-
-// redimensionnement
-
-document.addEventListener("mousemove", e => {
-
-    if(!resize) return;
-
-
-    let dx = e.clientX - startX;
-    let dy = e.clientY - startY;
-
-
-
-    let width = startWidth;
-    let height = startHeight;
-
-    let left = startLeft;
-    let top = startTop;
-
-
-
-    if(direction.includes("right")){
-
-        width = startWidth + dx;
-
-    }
-
-
-    if(direction.includes("bottom")){
-
-        height = startHeight + dy;
-
-    }
-
-
-    if(direction.includes("left")){
-
-        width = startWidth - dx;
-
-        left = startLeft + dx;
-
-    }
-
-
-    if(direction.includes("top")){
-
-        height = startHeight - dy;
-
-        top = startTop + dy;
-
-    }
-
-
-
-    if(width > 100){
-
-        wrapper.style.width = width + "px";
-
-    }
-
-
-    if(height > 100){
-
-        wrapper.style.height = height + "px";
-
-    }
-
-
-    if(direction.includes("left")){
-
-        wrapper.style.left = left + "px";
-
-    }
-
-
-    if(direction.includes("top")){
-
-        wrapper.style.top = top + "px";
-
-    }
-
-
-});
-
-
-
-// arrêt
-
-document.addEventListener("mouseup", () => {
-
-    resize = false;
-
-    direction = "";
 
 });
